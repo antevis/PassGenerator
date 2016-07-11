@@ -125,9 +125,8 @@ protocol PersonalDataProvider: FullNameProvider, SSNProvider {
 }
 
 //defines Employee properties
-protocol Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, DiscountClaimant {
+protocol Employee: Entrant, PersonalDataProvider, AddressProvider, BirthdayProvider, DiscountClaimant {
 	
-
 }
 
 //extends employee properties with Management Tier
