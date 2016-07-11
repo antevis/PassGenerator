@@ -39,7 +39,7 @@ struct RideAccess {
 	
 	let unlimitedAccess: Bool
 	let skipLines: Bool
-//	let seeEntrantAccessRules: Bool //Uncomment in Part 2
+	//	let seeEntrantAccessRules: Bool //Uncomment in Part 2
 }
 
 struct DiscountParams {
@@ -108,7 +108,7 @@ protocol BirthdayProvider {
 
 //Vendor, For Part 2
 //protocol VisitDateDependant {
-//	
+//
 //	var visitDate: NSDate { get }
 //}
 
@@ -119,16 +119,60 @@ protocol ManagementTierProvider {
 }
 
 //defines Employee properties
-protocol Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, DiscountClaimant {
-
-	//Since SSN requested from employees only, be it here
-	var ssn: String { get }
+class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, DiscountClaimant {
+	
+	//Since SSN being requested from employees only, be it here
+	let ssn: String
+	let accessRules: RideAccess
+	let accessibleAreas: [Area]
+	let fullName: PersonFullName
+	let address: Address
+	let birthDate: NSDate
+	let discounts: [DiscountParams]
+	
+	init(accessibleAreas: [Area], accessRules: RideAccess, discounts: [DiscountParams], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) {
+		
+		self.ssn = ssn
+		self.accessibleAreas = accessibleAreas
+		self.accessRules = accessRules
+		self.fullName = fullName
+		self.address = address
+		self.birthDate = birthDate
+		self.discounts = discounts
+		
+	}
+	
+	
+	convenience init(accessibleAreas: [Area], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
+		
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
+		
+		let discounts: [DiscountParams] = [
+			
+			DiscountParams(subject: .food, discountValue: 15),
+			DiscountParams(subject: .merchandise, discountValue: 25)
+		]
+		
+		self.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts,fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+	}
+	
+	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) {
+		
+		let accessibleAreas: [Area] = [.amusement]
+		
+		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+	}
+	
+	func swipe() -> EntryRules {
+		
+		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts)
+	}
 }
 
 //extends employee properties with Management Tier
-protocol ManagerType: Employee, ManagementTierProvider {
-	
-}
+//protocol ManagerType: Employee, ManagementTierProvider {
+//
+//}
 
 //Describes any type of entrant.
 protocol Entrant: Riding {
@@ -145,34 +189,6 @@ extension Entrant {
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil)
 	}
 }
-
-class Hourly: DiscountClaimant, FullNameProvider, AddressProvider, BirthdayProvider {
-	
-	let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: false)
-	
-	let discounts: [DiscountParams] = [
-		
-		DiscountParams(subject: .food, discountValue: 15),
-		DiscountParams(subject: .merchandise, discountValue: 25)
-	]
-	
-	let birthDate: NSDate
-	
-	let fullName: PersonFullName
-	
-	let ssn: String
-	
-	let address: Address
-	
-	init(birthDate: NSDate, fullName: PersonFullName, socSecNumber: String, address: Address) {
-		
-		self.birthDate = birthDate
-		self.fullName = fullName
-		self.ssn = socSecNumber
-		self.address = address
-	}
-}
-
 
 
 //MARK: Entrant classes
@@ -210,52 +226,49 @@ class FreeChildGuest: ClassicGuest, BirthdayProvider {
 	}
 }
 
-class HourlyEmployeeCatering: Hourly, Employee {
+class HourlyEmployeeCatering: Employee {
 	
-	let accessibleAreas: [Area] = [.amusement, .kitchen]
-}
-
-class HourlyEmployeeRideServices: Hourly, Employee {
-	
-	let accessibleAreas: [Area] = [.amusement, .rideControl]
-}
-
-class HourlyEmployeeMaintenance: Hourly, Employee {
-	
-	let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance]
-}
-
-class Manager: ManagerType {
-	
-	let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance, .office]
-	
-	let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: false)
-	
-	let discounts: [DiscountParams] = [
+	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
 		
-		DiscountParams(subject: .food, discountValue: 25),
-		DiscountParams(subject: .merchandise, discountValue: 25)
-	]
+		let accessibleAreas: [Area] = [.amusement, .kitchen]
+		
+		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+	}
+}
+
+class HourlyEmployeeRideService: Employee {
 	
-	let birthDate: NSDate
+	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
+		
+		let accessibleAreas: [Area] = [.amusement, .rideControl]
+		
+		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+	}
+}
+
+class HourlyEmployeeMaintenance: Employee {
 	
-	let fullName: PersonFullName
-	
-	let ssn: String
-	
-	let address: Address
+	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
+		
+		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance]
+		
+		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+	}
+}
+
+class Manager: Employee, ManagementTierProvider {
 	
 	let tier: ManagementTier
 	
-	init(birthDate: NSDate, fullName: PersonFullName, socSecNumber: String, address: Address, tier: ManagementTier) {
+	init(tier: ManagementTier, fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) {
 		
-		self.birthDate = birthDate
-		self.fullName = fullName
-		self.ssn = socSecNumber
-		self.address = address
 		self.tier = tier
+		
+		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance, .office]
+		
+		let empl = Employee(fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+		
+		super.init(accessibleAreas: accessibleAreas, accessRules: empl.accessRules, discounts: empl.discounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
 	}
-	
-	
 }
 
