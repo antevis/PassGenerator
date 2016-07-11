@@ -49,7 +49,7 @@ struct DiscountParams {
 }
 
 
-struct EntrantRules {
+struct EntryRules {
 	
 	let areaAccess: [Area]
 	let rideAccess: RideAccess
@@ -74,9 +74,14 @@ struct Address {
 
 //MARK: protocols
 
-//Most protocols below deliberately define a single value, for absolute resшlience in constructing objects
+//Most protocols below deliberately define a single value, for absolute resilience in constructing objects
 
-//Most entrants conform to this
+protocol Riding {
+	
+	var accessRules: RideAccess { get }
+}
+
+//Most entrants should conform to this
 protocol DiscountClaimant {
 	
 	var discounts: [DiscountParams] { get }
@@ -86,12 +91,6 @@ protocol DiscountClaimant {
 protocol FullNameProvider {
 	
 	var fullName: PersonFullName { get }
-}
-
-//Hourly Employee, Manager, Contract Employee
-protocol SSNProvider {
-	
-	var ssn: String { get }
 }
 
 //Hourly Employee, Manager, Season Pass Guest, Contract Employee
@@ -119,77 +118,37 @@ protocol ManagementTierProvider {
 	var tier: ManagementTier { get }
 }
 
-//Joins those who have to provide both: Employees, Managers
-protocol PersonalDataProvider: FullNameProvider, SSNProvider {
-	
-}
-
 //defines Employee properties
-protocol Employee: Entrant, PersonalDataProvider, AddressProvider, BirthdayProvider, DiscountClaimant {
-	
+protocol Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, DiscountClaimant {
+
+	//Since SSN requested from employees only, be it here
+	var ssn: String { get }
 }
 
 //extends employee properties with Management Tier
-protocol Manager: Employee, ManagementTierProvider {
+protocol ManagerType: Employee, ManagementTierProvider {
 	
 }
 
 //Describes any type of entrant.
-protocol Entrant {
+protocol Entrant: Riding {
 	
 	var accessibleAreas: [Area] { get }
-	var accessRules: RideAccess { get }
 	
-	func swipe() -> EntrantRules
+	func swipe() -> EntryRules
 }
 
-//MARK: Entrant classes
-
-class ClassicGuest: Entrant {
+extension Entrant {
 	
-	let accessibleAreas: [Area] = [.amusement]
+	//Default swipe implementation
+	func swipe() -> EntryRules {
+		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil)
+	}
+}
+
+class Hourly: DiscountClaimant, FullNameProvider, AddressProvider, BirthdayProvider {
+	
 	let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: false)
-	
-	func swipe() -> EntrantRules {
-		return EntrantRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil)
-	}
-}
-
-class VipGuest: Entrant, DiscountClaimant {
-	
-	let accessibleAreas: [Area] = [.amusement]
-	let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: true)
-	
-	let discounts: [DiscountParams] = [
-		
-		DiscountParams(subject: .food, discountValue: 10),
-		DiscountParams(subject: .merchandise, discountValue: 20)
-	]
-	
-	func swipe() -> EntrantRules {
-		
-		return EntrantRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts)
-	}
-}
-
-class FreeChildGuest: ClassicGuest, BirthdayProvider {
-	
-	let birthDate: NSDate
-	
-	init(birthDate: NSDate) {
-		
-		self.birthDate = birthDate
-	}
-}
-
-class HourlyEmployeeCatering: Employee {
-	
-	let accessibleAreas: [Area] = [.amusement, .kitchen]
-	let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: false)
-	
-	func swipe() -> EntrantRules {
-		return EntrantRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil)
-	}
 	
 	let discounts: [DiscountParams] = [
 		
@@ -214,4 +173,89 @@ class HourlyEmployeeCatering: Employee {
 	}
 }
 
+
+
+//MARK: Entrant classes
+
+class ClassicGuest: Entrant {
+	
+	let accessibleAreas: [Area] = [.amusement]
+	let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: false)
+}
+
+class VipGuest: Entrant, DiscountClaimant {
+	
+	let accessibleAreas: [Area] = [.amusement]
+	let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: true)
+	
+	let discounts: [DiscountParams] = [
+		
+		DiscountParams(subject: .food, discountValue: 10),
+		DiscountParams(subject: .merchandise, discountValue: 20)
+	]
+	
+	func swipe() -> EntryRules {
+		
+		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts)
+	}
+}
+
+class FreeChildGuest: ClassicGuest, BirthdayProvider {
+	
+	let birthDate: NSDate
+	
+	init(birthDate: NSDate) {
+		
+		self.birthDate = birthDate
+	}
+}
+
+class HourlyEmployeeCatering: Hourly, Employee {
+	
+	let accessibleAreas: [Area] = [.amusement, .kitchen]
+}
+
+class HourlyEmployeeRideServices: Hourly, Employee {
+	
+	let accessibleAreas: [Area] = [.amusement, .rideControl]
+}
+
+class HourlyEmployeeMaintenance: Hourly, Employee {
+	
+	let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance]
+}
+
+class Manager: ManagerType {
+	
+	let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance, .office]
+	
+	let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: false)
+	
+	let discounts: [DiscountParams] = [
+		
+		DiscountParams(subject: .food, discountValue: 25),
+		DiscountParams(subject: .merchandise, discountValue: 25)
+	]
+	
+	let birthDate: NSDate
+	
+	let fullName: PersonFullName
+	
+	let ssn: String
+	
+	let address: Address
+	
+	let tier: ManagementTier
+	
+	init(birthDate: NSDate, fullName: PersonFullName, socSecNumber: String, address: Address, tier: ManagementTier) {
+		
+		self.birthDate = birthDate
+		self.fullName = fullName
+		self.ssn = socSecNumber
+		self.address = address
+		self.tier = tier
+	}
+	
+	
+}
 
