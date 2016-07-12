@@ -89,7 +89,7 @@ protocol DiscountClaimant {
 //Hourly Employee, Manager, Season Pass Guest, Senior Guest, ContractEmployee, Vendor
 protocol FullNameProvider {
 	
-	var fullName: PersonFullName { get }
+	var fullName: PersonFullName? { get }
 }
 
 //Hourly Employee, Manager, Season Pass Guest, Contract Employee
@@ -111,10 +111,10 @@ protocol ManagementTierProvider {
 }
 
 //Describes any type of entrant. Extended to BirthdayProvider for implementation of extra credit
-protocol Entrant: Riding, BirthdayProvider {
+//FullNameProvider - for optional names for all entrants.
+protocol Entrant: Riding, BirthdayProvider, FullNameProvider {
 	
 	var greeting: String { get }
-	
 	var accessibleAreas: [Area] { get }
 	
 	func swipe() -> EntryRules
@@ -131,10 +131,17 @@ extension Entrant {
 
 //MARK: Auxilliary methods (Yes, I don't like word 'Helper'))
 
-func composeGreetingConsidering(birthday: NSDate?) -> String {
+func composeGreetingConsidering(birthday: NSDate?, forEntrant fullName: PersonFullName?) -> String {
 	
 	//Every entrant will eventually get at least Hello in the Entrant rules.
-	var greeting: String = "Hello"
+	var addressing: String = ""
+	
+	if let name = fullName?.firstName {
+		
+		addressing += ", \(name)"
+	}
+	
+	var greeting: String = "Hello\(addressing)"
 	
 	if let birthday = birthday {
 		
@@ -146,6 +153,10 @@ func composeGreetingConsidering(birthday: NSDate?) -> String {
 		if today.month == bday.month && today.day == bday.day {
 			
 			greeting += ", Happy Birthday!"
+			
+		} else {
+			
+			greeting += "!"
 		}
 	}
 	
@@ -168,7 +179,7 @@ class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, Di
 	let ssn: String
 	let accessRules: RideAccess
 	let accessibleAreas: [Area]
-	let fullName: PersonFullName
+	let fullName: PersonFullName?
 	let address: Address
 	let birthDate: NSDate?
 	let discounts: [DiscountParams]
@@ -184,7 +195,7 @@ class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, Di
 		self.birthDate = birthDate
 		self.discounts = discounts
 		
-		self.greeting = composeGreetingConsidering(birthDate)
+		self.greeting = composeGreetingConsidering(birthDate, forEntrant: fullName)
 	}
 	
 	convenience init(accessibleAreas: [Area], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
@@ -210,14 +221,15 @@ class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, Di
 class Guest: BirthdayProvider {
 	
 	var birthDate: NSDate?
-	var greeting: String
+	var fullName: PersonFullName?
+	let greeting: String
 	let accessRules: RideAccess
 	let accessibleAreas: [Area]
 	
-	init(birthDate: NSDate? = nil, accessRules: RideAccess) {
+	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil, accessRules: RideAccess) {
 		
 		self.accessibleAreas = [.amusement]
-		self.greeting = composeGreetingConsidering(birthDate)
+		self.greeting = composeGreetingConsidering(birthDate, forEntrant: fullName)
 		self.accessRules = accessRules
 		
 		if let birthday = birthDate {
@@ -229,10 +241,10 @@ class Guest: BirthdayProvider {
 
 class ClassicGuest: Guest, Entrant {
 	
-	init(birthDate: NSDate? = nil) {
+	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil) {
 
 		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
-		super.init(birthDate: birthDate, accessRules: accessRules)
+		super.init(birthDate: birthDate, fullName: fullName, accessRules: accessRules)
 	}
 }
 
@@ -240,7 +252,7 @@ class VipGuest: Guest, Entrant, DiscountClaimant {
 	
 	let discounts: [DiscountParams]
 	
-	init(birthDate: NSDate? = nil) {
+	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil) {
 		
 		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true)
 		
@@ -250,7 +262,7 @@ class VipGuest: Guest, Entrant, DiscountClaimant {
 			DiscountParams(subject: .merchandise, discountValue: 20)
 		]
 		
-		super.init(birthDate: birthDate, accessRules: accessRules)
+		super.init(birthDate: birthDate, fullName: fullName, accessRules: accessRules)
 	}
 	
 	func swipe() -> EntryRules {
@@ -261,9 +273,9 @@ class VipGuest: Guest, Entrant, DiscountClaimant {
 
 class FreeChildGuest: ClassicGuest {
 	
-	init(birthDate: NSDate) {
+	init(birthDate: NSDate, fullName: PersonFullName? = nil) {
 		
-		super.init(birthDate: birthDate)
+		super.init(birthDate: birthDate, fullName: fullName)
 	}
 }
 
