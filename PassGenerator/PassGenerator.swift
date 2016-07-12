@@ -53,7 +53,7 @@ struct EntryRules {
 	let areaAccess: [Area]
 	let rideAccess: RideAccess
 	let discountAccess: [DiscountParams]?
-	let greeting: String
+	let greeting: String?
 	
 }
 
@@ -110,8 +110,10 @@ protocol ManagementTierProvider {
 	var tier: ManagementTier { get }
 }
 
-//Describes any type of entrant.
+//Describes any type of entrant. Extended to BirthdayProvider for implementation of extra credit
 protocol Entrant: Riding, BirthdayProvider {
+	
+	var greeting: String { get }
 	
 	var accessibleAreas: [Area] { get }
 	
@@ -122,8 +124,6 @@ extension Entrant {
 	
 	//Default swipe implementation
 	func swipe() -> EntryRules {
-		
-		let greeting: String = composeGreetingConsidering(birthDate)
 		
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil, greeting: greeting)
 	}
@@ -172,6 +172,7 @@ class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, Di
 	let address: Address
 	let birthDate: NSDate?
 	let discounts: [DiscountParams]
+	let greeting: String
 	
 	init(accessibleAreas: [Area], accessRules: RideAccess, discounts: [DiscountParams], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) {
 		
@@ -182,6 +183,8 @@ class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, Di
 		self.address = address
 		self.birthDate = birthDate
 		self.discounts = discounts
+		
+		self.greeting = composeGreetingConsidering(birthDate)
 	}
 	
 	convenience init(accessibleAreas: [Area], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
@@ -198,8 +201,6 @@ class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, Di
 	}
 	
 	func swipe() -> EntryRules {
-		
-		let greeting: String = composeGreetingConsidering(birthDate)
 		
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
 	}
@@ -221,14 +222,32 @@ class Guest: BirthdayProvider {
 
 class ClassicGuest: Guest, Entrant {
 	
+	let greeting: String
 	let accessibleAreas: [Area] = [.amusement]
-	let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: false)
+	let accessRules: RideAccess
+	
+	override init(birthDate: NSDate? = nil) {
+		
+		greeting = composeGreetingConsidering(birthDate)
+		accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
+		
+		super.init(birthDate: birthDate)
+	}
 }
 
 class VipGuest: Guest, Entrant, DiscountClaimant {
 	
+	let greeting: String
 	let accessibleAreas: [Area] = [.amusement]
-	let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: true)
+	let accessRules: RideAccess
+	
+	override init(birthDate: NSDate? = nil) {
+		
+		greeting = composeGreetingConsidering(birthDate)
+		accessRules = RideAccess(unlimitedAccess: true, skipLines: true)
+		
+		super.init(birthDate: birthDate)
+	}
 	
 	let discounts: [DiscountParams] = [
 		
@@ -237,8 +256,6 @@ class VipGuest: Guest, Entrant, DiscountClaimant {
 	]
 	
 	func swipe() -> EntryRules {
-		
-		let greeting: String = composeGreetingConsidering(birthDate)
 		
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
 	}
