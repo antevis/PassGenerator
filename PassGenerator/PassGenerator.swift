@@ -132,7 +132,7 @@ extension Entrant {
 
 func composeGreetingConsidering(birthday: NSDate?, forEntrant fullName: PersonFullName?) -> String {
 	
-	//Every entrant will eventually get at least Hello in the Entrant rules.
+	//Every entrant will eventually get at least "Hello" in the Entrant rules.
 	//Well, next 4 lines seem ugly. Knowing of ?? operator, will probably fix later.
 	var addressing: String = ""
 	
@@ -217,8 +217,8 @@ class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, Di
 	}
 }
 
-//To encapsulate all common guest properties
-class Guest: BirthdayProvider {
+//To encapsulate all common guest properties.
+class Guest: Entrant {
 	
 	var birthDate: NSDate?
 	var fullName: PersonFullName?
@@ -239,7 +239,7 @@ class Guest: BirthdayProvider {
 	}
 }
 
-class ClassicGuest: Guest, Entrant {
+class ClassicGuest: Guest {
 	
 	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil) {
 
@@ -248,7 +248,7 @@ class ClassicGuest: Guest, Entrant {
 	}
 }
 
-class VipGuest: Guest, Entrant, DiscountClaimant {
+class VipGuest: Guest, DiscountClaimant {
 	
 	let discounts: [DiscountParams]
 	
