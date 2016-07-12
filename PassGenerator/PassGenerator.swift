@@ -173,7 +173,7 @@ func composeGreetingConsidering(birthday: NSDate?, forEntrant fullName: PersonFu
 
 //defines Employee properties - to be extended for each specific type of employee
 //May seem over-complicated, but allows Hourly employees to be initialized in 3 lines of code
-class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, DiscountClaimant {
+class Employee: Entrant, AddressProvider, DiscountClaimant {
 	
 	//Since SSN being requested from employees only, be it here
 	let ssn: String
