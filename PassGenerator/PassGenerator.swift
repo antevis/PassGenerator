@@ -32,7 +32,6 @@ enum ManagementTier {
 	case senior
 }
 
-
 //MARK: structs
 
 struct RideAccess {
@@ -71,10 +70,9 @@ struct Address {
 	let zip: String
 }
 
-
 //MARK: protocols
 
-//Most protocols below deliberately define a single value, for absolute resilience in constructing objects
+//Most protocols below deliberately define a single value, for maximum resilience in constructing objects
 
 protocol Riding {
 	
@@ -106,19 +104,39 @@ protocol BirthdayProvider {
 	var birthDate: NSDate { get }
 }
 
-//Vendor, For Part 2
-//protocol VisitDateDependant {
-//
-//	var visitDate: NSDate { get }
-//}
-
 //Manager
 protocol ManagementTierProvider {
 	
 	var tier: ManagementTier { get }
 }
 
-//defines Employee properties
+
+//Describes any type of entrant.
+protocol Entrant: Riding {
+	
+	var accessibleAreas: [Area] { get }
+	
+	func swipe() -> EntryRules
+}
+
+extension Entrant {
+	
+	//Default swipe implementation
+	func swipe() -> EntryRules {
+		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil)
+	}
+}
+
+//Vendor, For Part 2
+//protocol VisitDateDependant {
+//
+//	var visitDate: NSDate { get }
+//}
+
+//MARK: Entrant classes
+
+//defines Employee properties - to be extended for each specific type of employee
+//May seem over-complicated, but allows Hourly employees to be initialized in 3 lines of code
 class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, DiscountClaimant {
 	
 	//Since SSN being requested from employees only, be it here
@@ -139,9 +157,7 @@ class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, Di
 		self.address = address
 		self.birthDate = birthDate
 		self.discounts = discounts
-		
 	}
-	
 	
 	convenience init(accessibleAreas: [Area], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
 		
@@ -156,42 +172,11 @@ class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, Di
 		self.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts,fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
 	}
 	
-	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) {
-		
-		let accessibleAreas: [Area] = [.amusement]
-		
-		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
-	}
-	
 	func swipe() -> EntryRules {
 		
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts)
 	}
 }
-
-//extends employee properties with Management Tier
-//protocol ManagerType: Employee, ManagementTierProvider {
-//
-//}
-
-//Describes any type of entrant.
-protocol Entrant: Riding {
-	
-	var accessibleAreas: [Area] { get }
-	
-	func swipe() -> EntryRules
-}
-
-extension Entrant {
-	
-	//Default swipe implementation
-	func swipe() -> EntryRules {
-		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil)
-	}
-}
-
-
-//MARK: Entrant classes
 
 class ClassicGuest: Entrant {
 	
@@ -266,9 +251,14 @@ class Manager: Employee, ManagementTierProvider {
 		
 		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance, .office]
 		
-		let empl = Employee(fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+		let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: false)
 		
-		super.init(accessibleAreas: accessibleAreas, accessRules: empl.accessRules, discounts: empl.discounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+		let managerDiscounts: [DiscountParams] = [
+			
+			DiscountParams(subject: .food, discountValue: 25),
+			DiscountParams(subject: .merchandise, discountValue: 25)
+		]
+		
+		super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: managerDiscounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
 	}
 }
-
