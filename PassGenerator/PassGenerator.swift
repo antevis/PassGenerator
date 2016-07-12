@@ -47,7 +47,6 @@ struct DiscountParams {
 	let discountValue: Double
 }
 
-
 struct EntryRules {
 	
 	let areaAccess: [Area]
