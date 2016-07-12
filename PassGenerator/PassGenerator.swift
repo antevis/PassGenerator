@@ -59,8 +59,8 @@ struct EntryRules {
 
 struct PersonFullName {
 	
-	let firstName: String
-	let lastName: String
+	let firstName: String?
+	let lastName: String?
 }
 
 struct Address {
@@ -134,6 +134,7 @@ extension Entrant {
 func composeGreetingConsidering(birthday: NSDate?, forEntrant fullName: PersonFullName?) -> String {
 	
 	//Every entrant will eventually get at least Hello in the Entrant rules.
+	//Well, next 4 lines seem ugly. Knowing of ?? operator, will probably fix later.
 	var addressing: String = ""
 	
 	if let name = fullName?.firstName {
