@@ -210,8 +210,15 @@ class Employee: Entrant, FullNameProvider, AddressProvider, BirthdayProvider, Di
 class Guest: BirthdayProvider {
 	
 	var birthDate: NSDate?
+	var greeting: String
+	let accessRules: RideAccess
+	let accessibleAreas: [Area]
 	
-	init(birthDate: NSDate? = nil) {
+	init(birthDate: NSDate? = nil, accessRules: RideAccess) {
+		
+		self.accessibleAreas = [.amusement]
+		self.greeting = composeGreetingConsidering(birthDate)
+		self.accessRules = accessRules
 		
 		if let birthday = birthDate {
 			
@@ -222,38 +229,29 @@ class Guest: BirthdayProvider {
 
 class ClassicGuest: Guest, Entrant {
 	
-	let greeting: String
-	let accessibleAreas: [Area] = [.amusement]
-	let accessRules: RideAccess
-	
-	override init(birthDate: NSDate? = nil) {
-		
-		greeting = composeGreetingConsidering(birthDate)
-		accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
-		
-		super.init(birthDate: birthDate)
+	init(birthDate: NSDate? = nil) {
+
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
+		super.init(birthDate: birthDate, accessRules: accessRules)
 	}
 }
 
 class VipGuest: Guest, Entrant, DiscountClaimant {
 	
-	let greeting: String
-	let accessibleAreas: [Area] = [.amusement]
-	let accessRules: RideAccess
+	let discounts: [DiscountParams]
 	
-	override init(birthDate: NSDate? = nil) {
+	init(birthDate: NSDate? = nil) {
 		
-		greeting = composeGreetingConsidering(birthDate)
-		accessRules = RideAccess(unlimitedAccess: true, skipLines: true)
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true)
 		
-		super.init(birthDate: birthDate)
+		discounts = [
+			
+			DiscountParams(subject: .food, discountValue: 10),
+			DiscountParams(subject: .merchandise, discountValue: 20)
+		]
+		
+		super.init(birthDate: birthDate, accessRules: accessRules)
 	}
-	
-	let discounts: [DiscountParams] = [
-		
-		DiscountParams(subject: .food, discountValue: 10),
-		DiscountParams(subject: .merchandise, discountValue: 20)
-	]
 	
 	func swipe() -> EntryRules {
 		
@@ -274,7 +272,6 @@ class HourlyEmployeeCatering: Employee {
 	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
 		
 		let accessibleAreas: [Area] = [.amusement, .kitchen]
-		
 		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
 	}
 }
@@ -284,7 +281,6 @@ class HourlyEmployeeRideService: Employee {
 	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
 		
 		let accessibleAreas: [Area] = [.amusement, .rideControl]
-		
 		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
 	}
 }
@@ -294,7 +290,6 @@ class HourlyEmployeeMaintenance: Employee {
 	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
 		
 		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance]
-		
 		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
 	}
 }
@@ -306,11 +301,8 @@ class Manager: Employee, ManagementTierProvider {
 	init(tier: ManagementTier, fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) {
 		
 		self.tier = tier
-		
 		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance, .office]
-		
 		let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: false)
-		
 		let managerDiscounts: [DiscountParams] = [
 			
 			DiscountParams(subject: .food, discountValue: 25),
