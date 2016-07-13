@@ -18,10 +18,10 @@ class ViewController: UIViewController {
 		
 		//UI Logic will definitely avoid force-unwrapping
 		let classicGuestDOB = birthDayFromComponents(day: 1, month: 10, year: 1978)!
-		let childGuestDOB = birthDayFromComponents(day: 1, month: 10, year: 2012)!
+		let childGuestDOB = birthDayFromComponents(day: 13, month: 7, year: 2012)!
 		let hefsDOB = birthDayFromComponents(day: 12, month: 12, year: 1985)!
 		let hersDOB = birthDayFromComponents(day: 2, month: 11, year: 1978)!
-		let hemtDOB = birthDayFromComponents(day: 17, month: 4, year: 1993)!
+		let hemtDOB = birthDayFromComponents(day: 13, month: 7, year: 1993)!
 		let managerDOB = birthDayFromComponents(day: 28, month: 02, year: 1990)!
 		
 		let classicName = PersonFullName(firstName: "John", lastName: "Smith")
@@ -67,6 +67,7 @@ class ViewController: UIViewController {
 			let rules = entrant.swipe()
 			
 			print("\(entrant.description):\r")
+			print("\(rules.greeting)\r")
 			
 			//=========== Area access test (emulates pressing each of 5 possible options
 			for area in areas {
