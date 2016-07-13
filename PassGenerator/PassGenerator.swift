@@ -7,8 +7,11 @@
 //
 
 import Foundation
+import AudioToolbox
 
 //MARK: enums
+
+var gameSound: SystemSoundID = 0
 
 enum Area {
 	
@@ -18,7 +21,7 @@ enum Area {
 	case maintenance
 	case office
 	
-	func testAccess(entryRules: EntryRules) -> (Bool, String) {
+	func testAccess(entryRules: EntryRules) -> (accessGranted: Bool, message: String) {
 		
 		let accessGranted = entryRules.areaAccess.contains(self)
 		
@@ -27,14 +30,16 @@ enum Area {
 		if accessGranted {
 			
 			message = "Access Granted"
-			//sound = ding
+			
+			loadGrantedSound()
 		} else {
 			
 			message = "Access Denied"
-			//sound = buzz
+			
+			loadDeniedSound()
 		}
 		
-		//playsound
+		playSound()
 		
 		return (accessGranted, message)
 	}
@@ -63,30 +68,33 @@ struct RideAccess {
 	
 	func description() -> String {
 		
-		let rideAccess = "\(testAccess(self.unlimitedAccess, trueText: "Has Unlimited access to rides", falseText: "Has no access to rides"))\r"
+		let rideAccess = "\(testAccess(self.unlimitedAccess, trueText: "Has Unlimited access to rides", falseText: "Has no access to rides").message)\r"
 		
-		let canSkip = "\(testAccess(self.skipLines, trueText: "Can Skip Lines", falseText: "Can't Skip Lines"))\r"
+		let canSkip = "\(testAccess(self.skipLines, trueText: "Can Skip Lines", falseText: "Cannot Skip Lines").message)\r"
 		
 		return "\(rideAccess)\(canSkip)"
 	}
 	
-	func testAccess(parameter: Bool, trueText: String = "Yes", falseText: String = "No", playSound: Bool = false) -> (param: Bool, message: String) {
+	func testAccess(parameter: Bool, trueText: String = "Yes", falseText: String = "No", makeSound: Bool = false) -> (param: Bool, message: String) {
 		
 		var message: String
 		
 		if parameter {
 			
 			message = trueText
-			//sound = ding
+			
+			loadGrantedSound()
+			
 		} else {
 			
 			message = falseText
-			//soud = buzz
+			
+			loadDeniedSound()
 		}
 		
-		if playSound {
+		if makeSound {
 			
-			//play sound
+			playSound()
 		}
 		
 		return (parameter, message)
@@ -166,9 +174,14 @@ protocol ManagementTierProvider {
 	var tier: ManagementTier { get }
 }
 
+protocol DescriptionProvider {
+	
+	var description: String { get }
+}
+
 //Describes any type of entrant. Extended to BirthdayProvider for implementation of extra credit
 //FullNameProvider - for optional names for all entrants.
-protocol Entrant: Riding, BirthdayProvider, FullNameProvider {
+protocol Entrant: Riding, BirthdayProvider, FullNameProvider, DescriptionProvider {
 	
 	var greeting: String { get }
 	var accessibleAreas: [Area] { get }
@@ -176,14 +189,6 @@ protocol Entrant: Riding, BirthdayProvider, FullNameProvider {
 	func swipe() -> EntryRules
 }
 
-extension Entrant {
-	
-	//Default swipe implementation
-	func swipe() -> EntryRules {
-		
-		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil, greeting: greeting)
-	}
-}
 
 //MARK: Auxilliary methods (Yes, I don't like word 'Helper'))
 
@@ -220,6 +225,33 @@ func composeGreetingConsidering(birthday: NSDate?, forEntrant fullName: PersonFu
 	return greeting
 }
 
+func birthDayFromComponents(day day: Int, month: Int, year: Int) -> NSDate? {
+	
+	let dateComponents: NSDateComponents = NSDateComponents()
+	dateComponents.day = day
+	dateComponents.month = month
+	dateComponents.year = year
+	
+	let calendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)
+	
+	return calendar?.dateFromComponents(dateComponents)
+}
+
+func discountTestOf(rules: EntryRules) {
+	
+	guard let discounts = rules.discountAccess where discounts.count > 0 else {
+		
+		print("No discounts found")
+		
+		return
+	}
+	
+	for discount in discounts {
+		
+		print(discount.description())
+	}
+}
+
 //Vendor, For Part 2
 //protocol VisitDateDependant {
 //
@@ -241,8 +273,9 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 	let birthDate: NSDate?
 	let discounts: [DiscountParams]
 	let greeting: String
+	let description: String
 	
-	init(accessibleAreas: [Area], accessRules: RideAccess, discounts: [DiscountParams], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) {
+	init(accessibleAreas: [Area], accessRules: RideAccess, discounts: [DiscountParams], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate, description: String) {
 		
 		self.ssn = ssn
 		self.accessibleAreas = accessibleAreas
@@ -253,9 +286,11 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 		self.discounts = discounts
 		
 		self.greeting = composeGreetingConsidering(birthDate, forEntrant: fullName)
+		
+		self.description = description
 	}
 	
-	convenience init(accessibleAreas: [Area], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
+	convenience init(accessibleAreas: [Area], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate, description: String) {
 		
 		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
 		
@@ -265,7 +300,7 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 			DiscountParams(subject: .merchandise, discountValue: 25)
 		]
 		
-		self.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts,fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+		self.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts,fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: description)
 	}
 	
 	func swipe() -> EntryRules {
@@ -282,8 +317,9 @@ class Guest: Entrant {
 	let greeting: String
 	let accessRules: RideAccess
 	let accessibleAreas: [Area]
+	let description: String
 	
-	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil, accessRules: RideAccess) {
+	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil, accessRules: RideAccess, description: String) {
 		
 		self.accessibleAreas = [.amusement]
 		self.greeting = composeGreetingConsidering(birthDate, forEntrant: fullName)
@@ -293,15 +329,22 @@ class Guest: Entrant {
 			
 			self.birthDate = birthday
 		}
+		
+		self.description = description
+	}
+	
+	func swipe() -> EntryRules {
+		
+		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil, greeting: greeting)
 	}
 }
 
 class ClassicGuest: Guest {
 	
-	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil) {
-
+	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil, description: String = "Classic Guest") {
+		
 		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
-		super.init(birthDate: birthDate, fullName: fullName, accessRules: accessRules)
+		super.init(birthDate: birthDate, fullName: fullName, accessRules: accessRules, description: description)
 	}
 }
 
@@ -309,7 +352,7 @@ class VipGuest: Guest, DiscountClaimant {
 	
 	let discounts: [DiscountParams]
 	
-	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil) {
+	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil, description: String = "VIP Guest") {
 		
 		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true)
 		
@@ -319,10 +362,10 @@ class VipGuest: Guest, DiscountClaimant {
 			DiscountParams(subject: .merchandise, discountValue: 20)
 		]
 		
-		super.init(birthDate: birthDate, fullName: fullName, accessRules: accessRules)
+		super.init(birthDate: birthDate, fullName: fullName, accessRules: accessRules, description: description)
 	}
 	
-	func swipe() -> EntryRules {
+	override func swipe() -> EntryRules {
 		
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
 	}
@@ -330,9 +373,9 @@ class VipGuest: Guest, DiscountClaimant {
 
 class FreeChildGuest: ClassicGuest {
 	
-	init(birthDate: NSDate, fullName: PersonFullName? = nil) {
+	init(birthDate: NSDate, fullName: PersonFullName? = nil, description: String = "Free Child Guest") {
 		
-		super.init(birthDate: birthDate, fullName: fullName)
+		super.init(birthDate: birthDate, fullName: fullName, description: description)
 	}
 }
 
@@ -341,7 +384,7 @@ class HourlyEmployeeCatering: Employee {
 	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
 		
 		let accessibleAreas: [Area] = [.amusement, .kitchen]
-		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Food Services")
 	}
 }
 
@@ -350,7 +393,7 @@ class HourlyEmployeeRideService: Employee {
 	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
 		
 		let accessibleAreas: [Area] = [.amusement, .rideControl]
-		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Ride Services")
 	}
 }
 
@@ -359,7 +402,7 @@ class HourlyEmployeeMaintenance: Employee {
 	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
 		
 		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance]
-		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Maintenance")
 	}
 }
 
@@ -378,6 +421,28 @@ class Manager: Employee, ManagementTierProvider {
 			DiscountParams(subject: .merchandise, discountValue: 25)
 		]
 		
-		super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: managerDiscounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate)
+		super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: managerDiscounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "\(self.tier) Manager")
 	}
+}
+
+//MARK: Audioservices
+func loadGrantedSound() {
+	
+	AudioServicesCreateSystemSoundID(soundUrlFor(file: "AccessGranted", ofType: "wav"), &gameSound)
+}
+
+func loadDeniedSound() {
+	
+	AudioServicesCreateSystemSoundID(soundUrlFor(file: "AccessDenied", ofType: "wav"), &gameSound)
+}
+
+func playSound(){
+	
+	AudioServicesPlaySystemSound(gameSound)
+}
+
+func soundUrlFor(file fileName: String, ofType: String) -> NSURL {
+	
+	let pathToSoundFile = NSBundle.mainBundle().pathForResource(fileName, ofType: ofType)
+	return NSURL(fileURLWithPath: pathToSoundFile!)
 }
