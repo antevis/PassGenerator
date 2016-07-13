@@ -13,6 +13,8 @@
 		2C8259B71D33829C001FA2E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C8259B61D33829C001FA2E2 /* Assets.xcassets */; };
 		2C8259BA1D33829C001FA2E2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C8259B81D33829C001FA2E2 /* LaunchScreen.storyboard */; };
 		2C8259C21D338359001FA2E2 /* PassGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8259C11D338358001FA2E2 /* PassGenerator.swift */; };
+		2C8259C51D364A41001FA2E2 /* AccessDenied.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C8259C31D364A41001FA2E2 /* AccessDenied.wav */; };
+		2C8259C61D364A41001FA2E2 /* AccessGranted.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C8259C41D364A41001FA2E2 /* AccessGranted.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		2C8259B91D33829C001FA2E2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2C8259BB1D33829C001FA2E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2C8259C11D338358001FA2E2 /* PassGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassGenerator.swift; sourceTree = "<group>"; };
+		2C8259C31D364A41001FA2E2 /* AccessDenied.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = AccessDenied.wav; sourceTree = "<group>"; };
+		2C8259C41D364A41001FA2E2 /* AccessGranted.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = AccessGranted.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,8 @@
 		2C8259AE1D33829C001FA2E2 /* PassGenerator */ = {
 			isa = PBXGroup;
 			children = (
+				2C8259C31D364A41001FA2E2 /* AccessDenied.wav */,
+				2C8259C41D364A41001FA2E2 /* AccessGranted.wav */,
 				2C8259AF1D33829C001FA2E2 /* AppDelegate.swift */,
 				2C8259B11D33829C001FA2E2 /* ViewController.swift */,
 				2C8259B31D33829C001FA2E2 /* Main.storyboard */,
@@ -126,8 +132,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				2C8259BA1D33829C001FA2E2 /* LaunchScreen.storyboard in Resources */,
+				2C8259C61D364A41001FA2E2 /* AccessGranted.wav in Resources */,
 				2C8259B71D33829C001FA2E2 /* Assets.xcassets in Resources */,
 				2C8259B51D33829C001FA2E2 /* Main.storyboard in Resources */,
+				2C8259C51D364A41001FA2E2 /* AccessDenied.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

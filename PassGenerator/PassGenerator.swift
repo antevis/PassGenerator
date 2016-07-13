@@ -17,9 +17,30 @@ enum Area {
 	case rideControl
 	case maintenance
 	case office
+	
+	func testAccess(entryRules: EntryRules) -> (Bool, String) {
+		
+		let accessGranted = entryRules.areaAccess.contains(self)
+		
+		var message: String
+		
+		if accessGranted {
+			
+			message = "Access Granted"
+			//sound = ding
+		} else {
+			
+			message = "Access Denied"
+			//sound = buzz
+		}
+		
+		//playsound
+		
+		return (accessGranted, message)
+	}
 }
 
-enum DiscountSubject {
+enum DiscountSubject: String {
 	
 	case food
 	case merchandise
@@ -39,12 +60,48 @@ struct RideAccess {
 	let unlimitedAccess: Bool
 	let skipLines: Bool
 	//	let seeEntrantAccessRules: Bool //Uncomment in Part 2
+	
+	func description() -> String {
+		
+		let rideAccess = "\(testAccess(self.unlimitedAccess, trueText: "Has Unlimited access to rides", falseText: "Has no access to rides"))\r"
+		
+		let canSkip = "\(testAccess(self.skipLines, trueText: "Can Skip Lines", falseText: "Can't Skip Lines"))\r"
+		
+		return "\(rideAccess)\(canSkip)"
+	}
+	
+	func testAccess(parameter: Bool, trueText: String = "Yes", falseText: String = "No", playSound: Bool = false) -> (param: Bool, message: String) {
+		
+		var message: String
+		
+		if parameter {
+			
+			message = trueText
+			//sound = ding
+		} else {
+			
+			message = falseText
+			//soud = buzz
+		}
+		
+		if playSound {
+			
+			//play sound
+		}
+		
+		return (parameter, message)
+	}
 }
 
 struct DiscountParams {
 	
 	let subject: DiscountSubject
 	let discountValue: Double
+	
+	func description() -> String {
+		
+		return "Has a discount of \(discountValue)% on \(subject)"
+	}
 }
 
 struct EntryRules {
