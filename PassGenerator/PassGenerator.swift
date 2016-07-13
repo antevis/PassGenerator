@@ -58,6 +58,26 @@ enum ManagementTier {
 	case senior
 }
 
+enum EntrantError: ErrorType {
+	
+	case NotAKidAnymore(YearThreshold: Int)
+	
+	case FirstNameMissing
+	case LastNameMissing
+	
+	//these four represent non-optional types in all initializers, thus not handling them until part 2, when filling in the UI fields
+	case SsnMissing
+	case DobMissing
+	case ManagerTierMissing
+	case dateOfBirthMissing
+	
+	//these four being thrown from the init, but handling defered until UI in Part 2
+	case AddressStreetMissing
+	case AddressCityMissing
+	case AddressStateMissing
+	case AddressZipMissing
+}
+
 //MARK: structs
 
 struct RideAccess {
@@ -133,6 +153,32 @@ struct Address {
 	let city: String
 	let state: String
 	let zip: String
+	
+	init(street: String?, city: String?, state: String?, zip: String?) throws {
+		
+		guard let street = street else {
+			
+			throw EntrantError.AddressStreetMissing
+		}
+		guard let city = city else {
+			
+			throw EntrantError.AddressCityMissing
+		}
+		guard let state = state else {
+			
+			throw EntrantError.AddressStateMissing
+		}
+		guard let zip = zip else {
+			
+			throw EntrantError.AddressZipMissing
+		}
+		
+		self.city = city
+		self.state = state
+		self.streetAddress = street
+		self.zip = zip
+		
+	}
 }
 
 //MARK: protocols
@@ -225,16 +271,23 @@ func composeGreetingConsidering(birthday: NSDate?, forEntrant fullName: PersonFu
 	return greeting
 }
 
-func birthDayFromComponents(day day: Int, month: Int, year: Int) -> NSDate? {
+func dateFromComponents(day day: Int, month: Int, year: Int) -> NSDate? {
 	
 	let dateComponents: NSDateComponents = NSDateComponents()
 	dateComponents.day = day
 	dateComponents.month = month
 	dateComponents.year = year
 	
-	let calendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)
+	let calendar = NSCalendar.currentCalendar()
 	
-	return calendar?.dateFromComponents(dateComponents)
+	return calendar.dateFromComponents(dateComponents)
+}
+
+func fullYearsFrom(date: NSDate) -> Int {
+	
+	let components = NSCalendar.currentCalendar().components(.Year, fromDate: date, toDate: NSDate(), options: .MatchFirst)
+	
+	return components.year
 }
 
 func discountTestOf(rules: EntryRules) {
@@ -275,7 +328,17 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 	let greeting: String
 	let description: String
 	
-	init(accessibleAreas: [Area], accessRules: RideAccess, discounts: [DiscountParams], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate, description: String) {
+	init(accessibleAreas: [Area], accessRules: RideAccess, discounts: [DiscountParams], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate, description: String) throws {
+		
+		guard fullName.firstName != nil else {
+			
+			throw EntrantError.FirstNameMissing
+		}
+		
+		guard fullName.lastName != nil else {
+			
+			throw EntrantError.LastNameMissing
+		}
 		
 		self.ssn = ssn
 		self.accessibleAreas = accessibleAreas
@@ -290,7 +353,7 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 		self.description = description
 	}
 	
-	convenience init(accessibleAreas: [Area], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate, description: String) {
+	convenience init(accessibleAreas: [Area], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate, description: String) throws {
 		
 		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
 		
@@ -300,7 +363,8 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 			DiscountParams(subject: .merchandise, discountValue: 25)
 		]
 		
-		self.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts,fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: description)
+		
+		try self.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts,fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: description)
 	}
 	
 	func swipe() -> EntryRules {
@@ -373,7 +437,12 @@ class VipGuest: Guest, DiscountClaimant {
 
 class FreeChildGuest: ClassicGuest {
 	
-	init(birthDate: NSDate, fullName: PersonFullName? = nil, description: String = "Free Child Guest") {
+	init(birthDate: NSDate, fullName: PersonFullName? = nil, description: String = "Free Child Guest") throws {
+		
+		if fullYearsFrom(birthDate) > 5 {
+			
+			throw EntrantError.NotAKidAnymore(YearThreshold: 5)
+		}
 		
 		super.init(birthDate: birthDate, fullName: fullName, description: description)
 	}
@@ -381,28 +450,61 @@ class FreeChildGuest: ClassicGuest {
 
 class HourlyEmployeeCatering: Employee {
 	
-	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
+	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) throws {
 		
 		let accessibleAreas: [Area] = [.amusement, .kitchen]
-		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Food Services")
+		
+		do {
+			try self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Food Services")
+			
+		} catch EntrantError.FirstNameMissing {
+			
+			print("First Name Missing")
+			
+		} catch EntrantError.LastNameMissing {
+			
+			print("Last Name Missing")
+		}
 	}
 }
 
 class HourlyEmployeeRideService: Employee {
 	
-	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
+	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) throws {
 		
 		let accessibleAreas: [Area] = [.amusement, .rideControl]
-		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Ride Services")
+		
+		do {
+			try self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Ride Services")
+			
+		} catch EntrantError.FirstNameMissing {
+			
+			print("First Name Missing")
+			
+		} catch EntrantError.LastNameMissing {
+			
+			print("Last Name Missing")
+		}
 	}
 }
 
 class HourlyEmployeeMaintenance: Employee {
 	
-	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate){
+	convenience init(fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) throws {
 		
 		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance]
-		self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Maintenance")
+		
+		do {
+			try self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Maintenance")
+			
+		} catch EntrantError.FirstNameMissing {
+			
+			print("First Name Missing")
+			
+		} catch EntrantError.LastNameMissing {
+			
+			print("Last Name Missing")
+		}
 	}
 }
 
@@ -410,7 +512,7 @@ class Manager: Employee, ManagementTierProvider {
 	
 	let tier: ManagementTier
 	
-	init(tier: ManagementTier, fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) {
+	init(tier: ManagementTier, fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate)  {
 		
 		self.tier = tier
 		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance, .office]
@@ -421,7 +523,17 @@ class Manager: Employee, ManagementTierProvider {
 			DiscountParams(subject: .merchandise, discountValue: 25)
 		]
 		
-		super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: managerDiscounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "\(self.tier) Manager")
+		do {
+			try super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: managerDiscounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "\(self.tier) Manager")
+			
+		} catch EntrantError.FirstNameMissing {
+			
+			print("First Name Missing")
+			
+		} catch EntrantError.LastNameMissing {
+			
+			print("Last Name Missing")
+		}
 	}
 }
 

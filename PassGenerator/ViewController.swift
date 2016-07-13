@@ -17,12 +17,15 @@ class ViewController: UIViewController {
 		//let areas: [Area] = [.amusement]
 		
 		//UI Logic will definitely avoid force-unwrapping
-		let classicGuestDOB = birthDayFromComponents(day: 1, month: 10, year: 1978)!
-		let childGuestDOB = birthDayFromComponents(day: 13, month: 7, year: 2012)!
-		let hefsDOB = birthDayFromComponents(day: 12, month: 12, year: 1985)!
-		let hersDOB = birthDayFromComponents(day: 2, month: 11, year: 1978)!
-		let hemtDOB = birthDayFromComponents(day: 13, month: 7, year: 1993)!
-		let managerDOB = birthDayFromComponents(day: 28, month: 02, year: 1990)!
+		let classicGuestDOB = dateFromComponents(day: 1, month: 10, year: 1978)!
+		
+		//let childGuestDOB = dateFromComponents(day: 13, month: 7, year: 2010)! //throws an error
+		let childGuestDOB = dateFromComponents(day: 13, month: 7, year: 2012)! //passes age threshold
+		
+		let hefsDOB = dateFromComponents(day: 12, month: 12, year: 1985)!
+		let hersDOB = dateFromComponents(day: 2, month: 11, year: 1978)!
+		let hemtDOB = dateFromComponents(day: 13, month: 7, year: 1993)!
+		let managerDOB = dateFromComponents(day: 28, month: 02, year: 1990)!
 		
 		let classicName = PersonFullName(firstName: "John", lastName: "Smith")
 		let childName = PersonFullName(firstName: "Harry", lastName: nil)
@@ -31,10 +34,10 @@ class ViewController: UIViewController {
 		let hemtName = PersonFullName(firstName: "Peter", lastName: "Jackson")
 		let managerName = PersonFullName(firstName: "Managus", lastName: "Treater")
 		
-		let hefsAddress: Address = Address(streetAddress: "Broadway 1", city: "New York", state: "NY", zip: "22222")
-		let hersAddrsess = Address(streetAddress: "Poland str.", city: "Warsaw", state: "EU", zip: "33249")
-		let hemtAddress = Address(streetAddress: "London str.", city: "Vilnius", state: "LT", zip: "23455")
-		let managerAddress = Address(streetAddress: "Infinite Loop", city: "Cupertino", state: "CA", zip: "99982")
+		let hefsAddress: Address = try! Address(street: "Broadway 1", city: "New York", state: "NY", zip: "22222")
+		let hersAddrsess = try! Address(street: "Poland str.", city: "Warsaw", state: "EU", zip: "33249")
+		let hemtAddress = try! Address(street: "London str.", city: "Vilnius", state: "LT", zip: "23455")
+		let managerAddress = try! Address(street: "Infinite Loop", city: "Cupertino", state: "CA", zip: "99982")
 		
 		let hefsSsn	= "333-22-5555"
 		let hersSsn = "444-22-5555"
@@ -46,7 +49,22 @@ class ViewController: UIViewController {
 		
 		let vipGuest = VipGuest()
 		
-		let freeChild = FreeChildGuest(birthDate: childGuestDOB, fullName: childName)
+		//let freeChild = FreeChildGuest(birthDate: childGuestDOB, fullName: childName)
+		
+		//Uncomment to get a 'Free Child' guest
+		
+		var freeChild: FreeChildGuest?
+		
+		do {
+			
+			try freeChild = FreeChildGuest(birthDate: childGuestDOB, fullName: childName)
+		
+		} catch EntrantError.NotAKidAnymore(let yearThreshold) {
+			
+			print("Looks too grown-up for \(yearThreshold)-old:)\n")
+			
+		} catch { }
+		
 		
 		let hefs = HourlyEmployeeCatering(fullName: hefsName, address: hefsAddress, ssn: hefsSsn, birthDate: hefsDOB)
 		
@@ -57,7 +75,13 @@ class ViewController: UIViewController {
 		let manager = Manager(tier: .shift, fullName: managerName, address: managerAddress, ssn: managerSsn, birthDate: managerDOB)
 		
 		
-		let entrants: [Entrant] = [classicGuest, vipGuest, freeChild, hefs, hers, hemt, manager]
+		var entrants: [Entrant] = [classicGuest, vipGuest, hefs, hers, hemt, manager]
+		
+		if let freeChild = freeChild {
+			
+			entrants.append(freeChild)
+		}
+		
 		let areas: [Area] = [Area.amusement, Area.kitchen, Area.maintenance, Area.office, Area.rideControl]
 		
 		
