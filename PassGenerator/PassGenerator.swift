@@ -512,24 +512,26 @@ class Manager: Employee, ManagementTierProvider {
 	
 	let tier: ManagementTier
 	
-	init(tier: ManagementTier, fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate)  {
+	init(tier: ManagementTier, fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) throws {
 		
 		self.tier = tier
+		
 		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance, .office]
-		let accessRules: RideAccess = RideAccess(unlimitedAccess: true, skipLines: false)
-		let managerDiscounts: [DiscountParams] = [
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
+		
+		let discounts: [DiscountParams] = [
 			
 			DiscountParams(subject: .food, discountValue: 25),
 			DiscountParams(subject: .merchandise, discountValue: 25)
 		]
 		
 		do {
-			try super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: managerDiscounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "\(self.tier) Manager")
-			
+		
+			try super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "\(tier) Manager")
+		
 		} catch EntrantError.FirstNameMissing {
 			
 			print("First Name Missing")
-			
 		} catch EntrantError.LastNameMissing {
 			
 			print("Last Name Missing")
