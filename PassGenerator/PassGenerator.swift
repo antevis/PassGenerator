@@ -108,7 +108,7 @@ struct DiscountParams {
 	
 	func description() -> String {
 		
-		return "Has a discount of \(discountValue)% on \(subject)"
+		return "Has discount of \(discountValue)% on \(subject)"
 	}
 }
 
