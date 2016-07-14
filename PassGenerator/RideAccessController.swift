@@ -8,6 +8,55 @@
 
 import Foundation
 
+//protocol marked 'class' to make it possible to declare delegate as 'weak'. Which in turn prevents retain cycle with intersted listeners.
+//https://www.natashatherobot.com/ios-weak-delegates-swift/
+protocol RideDelegate: class {
+	
+	func rideCompleted()
+}
+
+class Ride {
+	
+	var timer = NSTimer()
+	
+	weak var delegate: RideDelegate?
+	
+	var seconds = 0
+	
+	var rideDuration: Int
+	
+	init(withDuration duration: Int) {
+		
+		self.rideDuration = duration
+	}
+	
+	func startRide(rideDuration duration: Int = 10) {
+		
+		rideDuration = duration
+		
+		seconds = rideDuration
+		
+		timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: #selector(decreaseTimer), userInfo: nil, repeats: true)
+	}
+	
+	@objc func decreaseTimer() {
+		
+		seconds -= 1
+		
+		if seconds == 0 {
+			
+			timer.invalidate()
+			
+			endRide()
+		}
+	}
+	
+	func endRide() {
+		
+		delegate?.rideCompleted()
+	}
+}
+
 class RideAccessController: RideDelegate {
 	
 	var ride: Ride?
@@ -33,23 +82,26 @@ class RideAccessController: RideDelegate {
 		
 		if rules.rideAccess.unlimitedAccess {
 			
+			let sfx: SoundFX? = makeSound ? SoundFX() : nil
+			
 			if !self.rideSwiped {
 				
-				//For simplicity ride considered started right after swiping
+				//For simplicity the Ride considered started right after swiping
 				rideSwiped = true
 				ride?.startRide(rideDuration: 5)
+				
+				sfx?.loadGrantedSound()
 				
 				print("Welcome!")
 				
 			} else {
 				
-				let sfx: SoundFX? = makeSound ? SoundFX() : nil
-				
 				sfx?.loadDeniedSound()
-				sfx?.playSound()
 				
 				print("Ride is in progress, one swipe per ride, please.")
 			}
+			
+			sfx?.playSound()
 		}
 	}
 }
