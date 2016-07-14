@@ -60,22 +60,22 @@ enum ManagementTier {
 
 enum EntrantError: ErrorType {
 	
-	case NotAKidAnymore(YearThreshold: Int)
+	case NotAKidAnymore(yearThreshold: Int)
 	
-	case FirstNameMissing
-	case LastNameMissing
+	case FirstNameMissing(message: String)
+	case LastNameMissing(message: String)
 	
 	//these four represent non-optional types in all initializers, thus not handling them until part 2, when filling in the UI fields
-	case SsnMissing
-	case DobMissing
-	case ManagerTierMissing
-	case dateOfBirthMissing
+	case SsnMissing(message: String)
+	case DobMissing(message: String)
+	case ManagerTierMissing(message: String)
+	case dateOfBirthMissing(message: String)
 	
 	//these four being thrown from the init, but handling defered until UI in Part 2
-	case AddressStreetMissing
-	case AddressCityMissing
-	case AddressStateMissing
-	case AddressZipMissing
+	case AddressStreetMissing(message: String)
+	case AddressCityMissing(message: String)
+	case AddressStateMissing(message: String)
+	case AddressZipMissing(message: String)
 }
 
 //MARK: structs
@@ -158,19 +158,19 @@ struct Address {
 		
 		guard let street = street else {
 			
-			throw EntrantError.AddressStreetMissing
+			throw EntrantError.AddressStreetMissing(message: "Street address missing")
 		}
 		guard let city = city else {
 			
-			throw EntrantError.AddressCityMissing
+			throw EntrantError.AddressCityMissing(message: "City missing")
 		}
 		guard let state = state else {
 			
-			throw EntrantError.AddressStateMissing
+			throw EntrantError.AddressStateMissing(message: "State missing")
 		}
 		guard let zip = zip else {
 			
-			throw EntrantError.AddressZipMissing
+			throw EntrantError.AddressZipMissing(message: "ZIP-code missing")
 		}
 		
 		self.city = city
@@ -332,12 +332,12 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 		
 		guard fullName.firstName != nil else {
 			
-			throw EntrantError.FirstNameMissing
+			throw EntrantError.FirstNameMissing(message: "First Name Missing")
 		}
 		
 		guard fullName.lastName != nil else {
 			
-			throw EntrantError.LastNameMissing
+			throw EntrantError.LastNameMissing(message: "Last Name Missing")
 		}
 		
 		self.ssn = ssn
@@ -441,7 +441,7 @@ class FreeChildGuest: ClassicGuest {
 		
 		if fullYearsFrom(birthDate) > 5 {
 			
-			throw EntrantError.NotAKidAnymore(YearThreshold: 5)
+			throw EntrantError.NotAKidAnymore(yearThreshold: 5)
 		}
 		
 		super.init(birthDate: birthDate, fullName: fullName, description: description)
@@ -454,17 +454,7 @@ class HourlyEmployeeCatering: Employee {
 		
 		let accessibleAreas: [Area] = [.amusement, .kitchen]
 		
-		do {
-			try self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Food Services")
-			
-		} catch EntrantError.FirstNameMissing {
-			
-			print("First Name Missing")
-			
-		} catch EntrantError.LastNameMissing {
-			
-			print("Last Name Missing")
-		}
+		try self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Food Services")
 	}
 }
 
@@ -474,17 +464,7 @@ class HourlyEmployeeRideService: Employee {
 		
 		let accessibleAreas: [Area] = [.amusement, .rideControl]
 		
-		do {
-			try self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Ride Services")
-			
-		} catch EntrantError.FirstNameMissing {
-			
-			print("First Name Missing")
-			
-		} catch EntrantError.LastNameMissing {
-			
-			print("Last Name Missing")
-		}
+		try self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Ride Services")
 	}
 }
 
@@ -494,17 +474,7 @@ class HourlyEmployeeMaintenance: Employee {
 		
 		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance]
 		
-		do {
-			try self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Maintenance")
-			
-		} catch EntrantError.FirstNameMissing {
-			
-			print("First Name Missing")
-			
-		} catch EntrantError.LastNameMissing {
-			
-			print("Last Name Missing")
-		}
+		try self.init(accessibleAreas: accessibleAreas, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Hourly Employee Maintenance")
 	}
 }
 
@@ -525,17 +495,7 @@ class Manager: Employee, ManagementTierProvider {
 			DiscountParams(subject: .merchandise, discountValue: 25)
 		]
 		
-		do {
-		
-			try super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "\(tier) Manager")
-		
-		} catch EntrantError.FirstNameMissing {
-			
-			print("First Name Missing")
-		} catch EntrantError.LastNameMissing {
-			
-			print("Last Name Missing")
-		}
+		try super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "\(tier) Manager")
 	}
 }
 
