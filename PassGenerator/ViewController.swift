@@ -14,8 +14,6 @@ class ViewController: UIViewController {
 		super.viewDidLoad()
 		// Do any additional setup after loading the view, typically from a nib.
 		
-		
-		
 		//TODO: deal with force-unwrapping
 		let classicGuestDOB = Aux.dateFromComponents(day: 1, month: 10, year: 1978)!
 		
@@ -83,7 +81,7 @@ class ViewController: UIViewController {
 			
 			print("*********ERROR*********\rLooks too grown-up for \(yearThreshold)-year old:)\r*********ERROR*********\n")
 		
-		//For the purposes of 'Exhaustiveness'
+		//For the purposes of 'Exhaustiveness' as we are not inside of a throwing method
 		} catch {
 			
 			fatalError("Something really bad and unpredictable happened")
@@ -109,7 +107,7 @@ class ViewController: UIViewController {
 			
 			print(msg)
 		
-		//For the purposes of 'Exhaustiveness'
+		//For the purposes of 'Exhaustiveness' as we are not inside of a throwing method
 		} catch {
 			
 			fatalError("Something really bad and unpredictable happened")
@@ -134,7 +132,7 @@ class ViewController: UIViewController {
 			
 			print(msg)
 			
-			//For the purposes of 'Exhaustiveness'
+		//For the purposes of 'Exhaustiveness' as we are not inside of a throwing method
 		} catch {
 			
 			fatalError("Something really bad and unpredictable happened")
@@ -159,7 +157,7 @@ class ViewController: UIViewController {
 			
 			print(msg)
 			
-			//For the purposes of 'Exhaustiveness'
+		//For the purposes of 'Exhaustiveness' as we are not inside of a throwing method
 		} catch {
 			
 			fatalError("Something really bad and unpredictable happened")
@@ -185,7 +183,7 @@ class ViewController: UIViewController {
 			
 			print(msg)
 			
-			//For the purposes of 'Exhaustiveness'
+		//For the purposes of 'Exhaustiveness' as we are not inside of a throwing method
 		} catch {
 			
 			fatalError("Something really bad and unpredictable happened")
@@ -203,13 +201,14 @@ class ViewController: UIViewController {
 			
 			print("\(entrant.description)\n")
 			
+			//TODO: change greeting to non-optional
 			if let greeting = rules.greeting {
 				
 				print("\(greeting)\n")
 			}
 			
 			
-			//=========== Area access test (emulates pressing each of 5 possible options
+			//=========== Area access test (emulates button touch for each of 5 possible area options
 			for area in areas {
 				
 				//testing access for all area
@@ -221,10 +220,10 @@ class ViewController: UIViewController {
 			print("\(rules.rideAccess.description())")
 			print("\r")
 			
-			//Per category test (emulates pressing button for each of to possible options)
+			//=========== Ride Access test: Per category test (emulates button touch for each of possible options)
 			print("Unlimited Ride Access: \(rules.rideAccess.testAccess(rules.rideAccess.unlimitedAccess).message)")
-			
 			print("Can Skip Lines: \(rules.rideAccess.testAccess(rules.rideAccess.skipLines).message)")
+			
 			print("\r")
 			
 			//=========== Discount Test
