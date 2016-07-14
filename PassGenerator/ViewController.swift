@@ -14,16 +14,18 @@ class ViewController: UIViewController {
 		super.viewDidLoad()
 		// Do any additional setup after loading the view, typically from a nib.
 		
-		//TODO: deal with force-unwrapping
-		let classicGuestDOB = Aux.dateFromComponents(day: 1, month: 10, year: 1978)!
+		//Sure no force-unwrapping in UI Part 2
+		let classicGuestDOB = Aux.dateFromDMY(day: 1, month: 10, year: 1978)!
 		
-		let childGuestDOB = Aux.dateFromComponents(day: 14, month: 7, year: 2012)! //passes age threshold for Free Kid
-		//let childGuestDOB = Aux.dateFromComponents(day: 14, month: 7, year: 2010)! //throws 'Not a kid anymore'
+		let childGuestDOB = Aux.dateFromDMY(day: 14, month: 7, year: Aux.year() - 4)! //passes age threshold for Free Kid
+		//let childGuestDOB = Aux.dateFromDMY(day: 14, month: 7, year: Aux.year() - 6)! //throws 'Not a kid anymore'
 		
-		let hefsDOB = Aux.dateFromComponents(day: 12, month: 12, year: 1985)!
-		let hersDOB = Aux.dateFromComponents(day: 2, month: 11, year: 1978)!
-		let hemtDOB = Aux.dateFromComponents(day: 14, month: 7, year: 1993)!
-		let managerDOB = Aux.dateFromComponents(day: 28, month: 02, year: 1990)!
+		let hefsDOB = Aux.dateFromDMY(day: 12, month: 12, year: 1985)!
+		let hersDOB = Aux.dateFromDMY(day: 2, month: 11, year: 1978)!
+		
+		let hemtDOB = Aux.todayBirthday(year: 1993)! //Always birthday on review date
+		
+		let managerDOB = Aux.todayBirthday(year: 1990)! //Always birthday on review date
 		
 		let classicName = PersonFullName(firstName: "John", lastName: "Smith")
 		let childName = PersonFullName(firstName: "Harry", lastName: nil)
@@ -48,7 +50,6 @@ class ViewController: UIViewController {
 		let hemtSsn = "777-77-7777"
 		let managerSsn = "000-00-0000"
 		
-		
 		//===========Init of Classic Guest. No possible errors exist for this type
 		let classicGuest = ClassicGuest(birthDate: classicGuestDOB, fullName: classicName)
 		
@@ -60,7 +61,6 @@ class ViewController: UIViewController {
 		var hers: HourlyEmployeeRideService?
 		var hemt: HourlyEmployeeMaintenance?
 		var manager: Manager?
-		
 		
 		var entrants: [Entrant] = [classicGuest, vipGuest]
 		
@@ -201,12 +201,7 @@ class ViewController: UIViewController {
 			
 			print("\(entrant.description)\n")
 			
-			//TODO: change greeting to non-optional
-			if let greeting = rules.greeting {
-				
-				print("\(greeting)\n")
-			}
-			
+			print("\(rules.greeting)\n")
 			
 			//=========== Area access test (emulates button touch for each of 5 possible area options
 			for area in areas {
@@ -233,7 +228,7 @@ class ViewController: UIViewController {
 		}
 		
 		//=========== testing for double swipes per 1 ride
-		let doubleSwipeTester: DoubleSwipeTester = DoubleSwipeTester(entrant: classicGuest, testDurationSeconds: 17, timeStepSeconds: 1, rideDuration: 5)
+		let doubleSwipeTester: DoubleSwipeTester = DoubleSwipeTester(entrant: classicGuest, testDurationSeconds: 19, timeStepSeconds: 1, rideDuration: 5)
 		doubleSwipeTester.testForDoubleSwipes()
 	}
 
@@ -241,8 +236,5 @@ class ViewController: UIViewController {
 		super.didReceiveMemoryWarning()
 		// Dispose of any resources that can be recreated.
 	}
-	
-	
-	
 }
 

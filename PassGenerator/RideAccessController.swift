@@ -5,6 +5,7 @@
 //  Created by Ivan Kazakov on 14/07/16.
 //  Copyright © 2016 Antevis. All rights reserved.
 //
+// THIS CLASS IS FOR DEMONSTRATION OF TESTING AGAINST DOUBLE SWIPING
 
 import Foundation
 
@@ -30,6 +31,7 @@ class Ride {
 		self.rideDuration = duration
 	}
 	
+	//Default ride with 10 seconds duration by default
 	func startRide(rideDuration duration: Int = 10) {
 		
 		rideDuration = duration
@@ -57,6 +59,7 @@ class Ride {
 	}
 }
 
+//Represents a turnstile in front of a Ride
 class RideAccessController: RideDelegate {
 	
 	var ride: Ride?
@@ -92,13 +95,13 @@ class RideAccessController: RideDelegate {
 				
 				sfx?.loadGrantedSound()
 				
-				print("Welcome!")
+				print("Welcome to the Ride!\n")
 				
 			} else {
 				
 				sfx?.loadDeniedSound()
 				
-				print("Ride is in progress, one swipe per ride, please.")
+				print("Your ride is currently in progress. One swipe per ride, please.\n")
 			}
 			
 			sfx?.playSound()
@@ -112,6 +115,8 @@ class DoubleSwipeTester {
 	
 	private var secondsRemaining: Double
 	private var secondsElapsed: Double = 0
+	
+	private var attemptCount: Int = 1
 	private var timerStep: Double
 	
 	private var timer = NSTimer()
@@ -132,20 +137,20 @@ class DoubleSwipeTester {
 		
 		print("\n====== Double Swipe Test ======\n")
 		
-		print("Initial swipe:\r")
+		print("Initial swipe: ")
 			
 		timer = NSTimer.scheduledTimerWithTimeInterval(timerStep, target: self, selector: #selector(decreaseTimer), userInfo: nil, repeats: true)
 		
 		rideController.validateRideAccess(entrant)
-		
 	}
 	
 	@objc private func decreaseTimer() {
 		
 		secondsRemaining -= timerStep
 		secondsElapsed += timerStep
+		attemptCount += 1
 		
-		print("Swipe attempt: \(secondsElapsed) Seconds elapsed: ")
+		print("\(attemptCount) Swipe attempt: \(secondsElapsed) Seconds elapsed: ")
 		
 		rideController.validateRideAccess(entrant)
 		

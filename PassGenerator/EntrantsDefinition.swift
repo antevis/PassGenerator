@@ -135,7 +135,7 @@ struct EntryRules {
 	let areaAccess: [Area]
 	let rideAccess: RideAccess
 	let discountAccess: [DiscountParams]?
-	let greeting: String?
+	let greeting: String
 	
 }
 

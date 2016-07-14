@@ -45,7 +45,7 @@ class Auxilliary {
 		return greeting
 	}
 	
-	class func dateFromComponents(day day: Int, month: Int, year: Int) -> NSDate? {
+	class func dateFromDMY(day day: Int, month: Int, year: Int) -> NSDate? {
 		
 		let dateComponents: NSDateComponents = NSDateComponents()
 		dateComponents.day = day
@@ -55,6 +55,27 @@ class Auxilliary {
 		let calendar = NSCalendar.currentCalendar()
 		
 		return calendar.dateFromComponents(dateComponents)
+	}
+	
+	class func todayBirthday(year year: Int) -> NSDate? {
+		
+		let calendar = NSCalendar.currentCalendar()
+		
+		let todayComponents = calendar.components([.Month, .Day], fromDate: NSDate())
+		
+		let dateComponents: NSDateComponents = NSDateComponents()
+		dateComponents.year = year
+		dateComponents.day = todayComponents.day
+		dateComponents.month = todayComponents.month
+		
+		return calendar.dateFromComponents(dateComponents)
+	}
+	
+	class func year() -> Int {
+		
+		let comps = NSCalendar.currentCalendar().components([.Year], fromDate: NSDate())
+		
+		return comps.year
 	}
 	
 	class func fullYearsFrom(date: NSDate) -> Int {
