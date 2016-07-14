@@ -17,15 +17,15 @@ class ViewController: UIViewController {
 		
 		
 		//TODO: deal with force-unwrapping
-		let classicGuestDOB = dateFromComponents(day: 1, month: 10, year: 1978)!
+		let classicGuestDOB = Aux.dateFromComponents(day: 1, month: 10, year: 1978)!
 		
-		let childGuestDOB = dateFromComponents(day: 14, month: 7, year: 2012)! //passes age threshold for Free Kid
-		//let childGuestDOB = dateFromComponents(day: 14, month: 7, year: 2010)! //throws 'Not a kid anymore'
+		let childGuestDOB = Aux.dateFromComponents(day: 14, month: 7, year: 2012)! //passes age threshold for Free Kid
+		//let childGuestDOB = Aux.dateFromComponents(day: 14, month: 7, year: 2010)! //throws 'Not a kid anymore'
 		
-		let hefsDOB = dateFromComponents(day: 12, month: 12, year: 1985)!
-		let hersDOB = dateFromComponents(day: 2, month: 11, year: 1978)!
-		let hemtDOB = dateFromComponents(day: 14, month: 7, year: 1993)!
-		let managerDOB = dateFromComponents(day: 28, month: 02, year: 1990)!
+		let hefsDOB = Aux.dateFromComponents(day: 12, month: 12, year: 1985)!
+		let hersDOB = Aux.dateFromComponents(day: 2, month: 11, year: 1978)!
+		let hemtDOB = Aux.dateFromComponents(day: 14, month: 7, year: 1993)!
+		let managerDOB = Aux.dateFromComponents(day: 28, month: 02, year: 1990)!
 		
 		let classicName = PersonFullName(firstName: "John", lastName: "Smith")
 		let childName = PersonFullName(firstName: "Harry", lastName: nil)
@@ -228,7 +228,7 @@ class ViewController: UIViewController {
 			print("\r")
 			
 			//=========== Discount Test
-			discountTestOf(rules)
+			Aux.discountTestOf(rules)
 			print("======================================================\r")
 			
 		}

@@ -8,10 +8,7 @@
 
 import Foundation
 
-
 //MARK: enums
-
-
 
 enum Area {
 	
@@ -239,72 +236,7 @@ protocol Entrant: Riding, BirthdayProvider, FullNameProvider, DescriptionProvide
 
 //MARK: Auxilliary methods (Yes, I don't like word 'Helper'))
 
-func composeGreetingConsidering(birthday: NSDate?, forEntrant fullName: PersonFullName?) -> String {
-	
-	//Every entrant will eventually get at least "Hello" in the Entrant rules.
-	//Well, next 4 lines seem ugly. Knowing of ?? operator, will probably fix later.
-	var addressing: String = ""
-	
-	if let name = fullName?.firstName {
-		
-		addressing += ", \(name)"
-	}
-	
-	var greeting: String = "Hello\(addressing)"
-	
-	if let birthday = birthday {
-		
-		//Borrowed from @thedan84
-		let calendar = NSCalendar.currentCalendar()
-		let today = calendar.components([.Month, .Day], fromDate: NSDate())
-		let bday = calendar.components([.Month, .Day], fromDate: birthday)
-		
-		if today.month == bday.month && today.day == bday.day {
-			
-			greeting += ", Happy Birthday!"
-			
-		} else {
-			
-			greeting += "!"
-		}
-	}
-	
-	return greeting
-}
 
-func dateFromComponents(day day: Int, month: Int, year: Int) -> NSDate? {
-	
-	let dateComponents: NSDateComponents = NSDateComponents()
-	dateComponents.day = day
-	dateComponents.month = month
-	dateComponents.year = year
-	
-	let calendar = NSCalendar.currentCalendar()
-	
-	return calendar.dateFromComponents(dateComponents)
-}
-
-func fullYearsFrom(date: NSDate) -> Int {
-	
-	let components = NSCalendar.currentCalendar().components(.Year, fromDate: date, toDate: NSDate(), options: .MatchFirst)
-	
-	return components.year
-}
-
-func discountTestOf(rules: EntryRules) {
-	
-	guard let discounts = rules.discountAccess where discounts.count > 0 else {
-		
-		print("No discounts found")
-		
-		return
-	}
-	
-	for discount in discounts {
-		
-		print(discount.description())
-	}
-}
 
 //Vendor, For Part 2
 //protocol VisitDateDependant {
@@ -349,7 +281,7 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 		self.birthDate = birthDate
 		self.discounts = discounts
 		
-		self.greeting = composeGreetingConsidering(birthDate, forEntrant: fullName)
+		self.greeting = Aux.composeGreetingConsidering(birthDate, forEntrant: fullName)
 		
 		self.description = description
 	}
@@ -387,7 +319,7 @@ class Guest: Entrant {
 	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil, accessRules: RideAccess, description: String) {
 		
 		self.accessibleAreas = [.amusement]
-		self.greeting = composeGreetingConsidering(birthDate, forEntrant: fullName)
+		self.greeting = Aux.composeGreetingConsidering(birthDate, forEntrant: fullName)
 		self.accessRules = accessRules
 		
 		if let birthday = birthDate {
@@ -440,7 +372,7 @@ class FreeChildGuest: ClassicGuest {
 	
 	init(birthDate: NSDate, fullName: PersonFullName? = nil, description: String = "Free Child Guest") throws {
 		
-		if fullYearsFrom(birthDate) > 5 {
+		if Aux.fullYearsFrom(birthDate) > 5 {
 			
 			throw EntrantError.NotAKidAnymore(yearThreshold: 5)
 		}
