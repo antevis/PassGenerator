@@ -164,7 +164,6 @@ class ViewController: UIViewController {
 		}
 		//================================================
 		
-		
 		//===========Init of MANAGER Services Hourly Employee
 		do {
 			
@@ -190,9 +189,7 @@ class ViewController: UIViewController {
 		}
 		//===============================================
 		
-		
 		let areas: [Area] = [Area.amusement, Area.kitchen, Area.maintenance, Area.office, Area.rideControl]
-		
 		
 		//===========testing access
 		for entrant in entrants {
@@ -224,7 +221,6 @@ class ViewController: UIViewController {
 			//=========== Discount Test
 			Aux.discountTestOf(rules)
 			print("======================================================\r")
-			
 		}
 		
 		//=========== testing for double swipes per 1 ride

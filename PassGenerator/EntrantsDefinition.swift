@@ -233,11 +233,6 @@ protocol Entrant: Riding, BirthdayProvider, FullNameProvider, DescriptionProvide
 	func swipe() -> EntryRules
 }
 
-
-//MARK: Auxilliary methods (Yes, I don't like word 'Helper'))
-
-
-
 //Vendor, For Part 2
 //protocol VisitDateDependant {
 //
