@@ -7,11 +7,11 @@
 //
 
 import Foundation
-import AudioToolbox
+
 
 //MARK: enums
 
-var gameSound: SystemSoundID = 0
+
 
 enum Area {
 	
@@ -21,7 +21,9 @@ enum Area {
 	case maintenance
 	case office
 	
-	func testAccess(entryRules: EntryRules) -> (accessGranted: Bool, message: String) {
+	func testAccess(entryRules: EntryRules, makeSound: Bool = true) -> (accessGranted: Bool, message: String) {
+		
+		let sfx: SoundFX? = makeSound ? SoundFX() : nil
 		
 		let accessGranted = entryRules.areaAccess.contains(self)
 		
@@ -31,15 +33,15 @@ enum Area {
 			
 			message = "Access Granted"
 			
-			loadGrantedSound()
+			sfx?.loadGrantedSound()
 		} else {
 			
 			message = "Access Denied"
 			
-			loadDeniedSound()
+			sfx?.loadDeniedSound()
 		}
 		
-		playSound()
+		sfx?.playSound()
 		
 		return (accessGranted, message)
 	}
@@ -95,7 +97,9 @@ struct RideAccess {
 		return "\(rideAccess)\(canSkip)"
 	}
 	
-	func testAccess(parameter: Bool, trueText: String = "Yes", falseText: String = "No", makeSound: Bool = false) -> (param: Bool, message: String) {
+	func testAccess(parameter: Bool, trueText: String = "Yes", falseText: String = "No", makeSound: Bool = true) -> (param: Bool, message: String) {
+		
+		let sfx: SoundFX? = makeSound ? SoundFX() : nil
 		
 		var message: String
 		
@@ -103,19 +107,16 @@ struct RideAccess {
 			
 			message = trueText
 			
-			loadGrantedSound()
+			sfx?.loadGrantedSound()
 			
 		} else {
 			
 			message = falseText
 			
-			loadDeniedSound()
+			sfx?.loadDeniedSound()
 		}
 		
-		if makeSound {
-			
-			playSound()
-		}
+		sfx?.playSound()
 		
 		return (parameter, message)
 	}
@@ -499,24 +500,3 @@ class Manager: Employee, ManagementTierProvider {
 	}
 }
 
-//MARK: Audioservices
-func loadGrantedSound() {
-	
-	AudioServicesCreateSystemSoundID(soundUrlFor(file: "AccessGranted", ofType: "wav"), &gameSound)
-}
-
-func loadDeniedSound() {
-	
-	AudioServicesCreateSystemSoundID(soundUrlFor(file: "AccessDenied", ofType: "wav"), &gameSound)
-}
-
-func playSound(){
-	
-	AudioServicesPlaySystemSound(gameSound)
-}
-
-func soundUrlFor(file fileName: String, ofType: String) -> NSURL {
-	
-	let pathToSoundFile = NSBundle.mainBundle().pathForResource(fileName, ofType: ofType)
-	return NSURL(fileURLWithPath: pathToSoundFile!)
-}
