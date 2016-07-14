@@ -16,6 +16,7 @@ class ViewController: UIViewController {
 		
 		//Sure no force-unwrapping in UI Part 2
 		let classicGuestDOB = Aux.dateFromDMY(day: 1, month: 10, year: 1978)!
+		let vipDOB = Aux.dateFromDMY(day: 4, month: 7, year: 1776)
 		
 		let childGuestDOB = Aux.dateFromDMY(day: 14, month: 7, year: Aux.year() - 4)! //passes age threshold for Free Kid
 		//let childGuestDOB = Aux.dateFromDMY(day: 14, month: 7, year: Aux.year() - 6)! //throws 'Not a kid anymore'
@@ -28,6 +29,7 @@ class ViewController: UIViewController {
 		let managerDOB = Aux.todayBirthday(year: 1990)! //Always birthday on review date
 		
 		let classicName = PersonFullName(firstName: "John", lastName: "Smith")
+		let vipName = PersonFullName(firstName: "Thomas", lastName: "Jefferson")
 		let childName = PersonFullName(firstName: "Harry", lastName: nil)
 		
 		let hefsName = PersonFullName(firstName: "Maria", lastName: "Sanders") //passes mandatory first name
@@ -51,10 +53,16 @@ class ViewController: UIViewController {
 		let managerSsn = "000-00-0000"
 		
 		//===========Init of Classic Guest. No possible errors exist for this type
-		let classicGuest = ClassicGuest(birthDate: classicGuestDOB, fullName: classicName)
+		let classicGuestWithAll = ClassicGuest(birthDate: classicGuestDOB, fullName: classicName)
+		let classicGuestWithDob = ClassicGuest(birthDate: classicGuestDOB)
+		let classicGuestWithName = ClassicGuest(fullName: classicName)
+		let classicGuestWithNone = ClassicGuest()
 		
 		//===========Init of VIP Guest. No possible errors exist for this type
-		let vipGuest = VipGuest()
+		let vipGuestWithNone = VipGuest()
+		let vipGuestWithDob = VipGuest(birthDate: vipDOB)
+		let vipGuestWithName = VipGuest(fullName: vipName)
+		let vipguestWithAll = VipGuest(birthDate: vipDOB, fullName: vipName)
 		
 		var freeChild: FreeChildGuest?
 		var hefs: HourlyEmployeeCatering?
@@ -62,7 +70,7 @@ class ViewController: UIViewController {
 		var hemt: HourlyEmployeeMaintenance?
 		var manager: Manager?
 		
-		var entrants: [Entrant] = [classicGuest, vipGuest]
+		var entrants: [Entrant] = [classicGuestWithAll, classicGuestWithNone, classicGuestWithName, classicGuestWithDob, vipGuestWithDob, vipGuestWithNone, vipGuestWithDob, vipGuestWithName, vipguestWithAll]
 		
 		/*Error-handling at the stage of objects initialization makes sense only when required fields are wrapped inside another object or when the successful unit depends on the value iteslf rather than on its existence or absence. This leaves us with First/Last names for employees, which are wrapped inside PersonFullName object, and value of date of birth for Free Kid.*/
 		
@@ -224,7 +232,7 @@ class ViewController: UIViewController {
 		}
 		
 		//=========== testing for double swipes per 1 ride
-		let doubleSwipeTester: DoubleSwipeTester = DoubleSwipeTester(entrant: classicGuest, testDurationSeconds: 19, timeStepSeconds: 1, rideDuration: 5)
+		let doubleSwipeTester: DoubleSwipeTester = DoubleSwipeTester(entrant: classicGuestWithAll, testDurationSeconds: 19, timeStepSeconds: 1, rideDuration: 5)
 		doubleSwipeTester.testForDoubleSwipes()
 	}
 
