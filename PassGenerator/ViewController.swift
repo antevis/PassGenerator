@@ -231,11 +231,18 @@ class ViewController: UIViewController {
 			print("======================================================\r")
 			
 		}
+		
+		//=========== testing for double swipes per 1 ride
+		let doubleSwipeTester: DoubleSwipeTester = DoubleSwipeTester(entrant: classicGuest, testDurationSeconds: 17, timeStepSeconds: 1, rideDuration: 5)
+		doubleSwipeTester.testForDoubleSwipes()
 	}
 
 	override func didReceiveMemoryWarning() {
 		super.didReceiveMemoryWarning()
 		// Dispose of any resources that can be recreated.
 	}
+	
+	
+	
 }
 
