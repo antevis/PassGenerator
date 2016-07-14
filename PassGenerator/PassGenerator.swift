@@ -71,7 +71,7 @@ enum EntrantError: ErrorType {
 	case ManagerTierMissing(message: String)
 	case dateOfBirthMissing(message: String)
 	
-	//these four being thrown from the init, but handling defered until UI in Part 2
+	//these four being thrown from the Address init, but handling defered until UI in Part 2
 	case AddressStreetMissing(message: String)
 	case AddressCityMissing(message: String)
 	case AddressStateMissing(message: String)
@@ -158,19 +158,19 @@ struct Address {
 		
 		guard let street = street else {
 			
-			throw EntrantError.AddressStreetMissing(message: "Street address missing")
+			throw EntrantError.AddressStreetMissing(message: "*********ERROR*********\rStreet address missing\r*********ERROR*********\n")
 		}
 		guard let city = city else {
 			
-			throw EntrantError.AddressCityMissing(message: "City missing")
+			throw EntrantError.AddressCityMissing(message: "*********ERROR*********\rCity missing\r*********ERROR*********\n")
 		}
 		guard let state = state else {
 			
-			throw EntrantError.AddressStateMissing(message: "State missing")
+			throw EntrantError.AddressStateMissing(message: "*********ERROR*********\rState missing\r*********ERROR*********\n")
 		}
 		guard let zip = zip else {
 			
-			throw EntrantError.AddressZipMissing(message: "ZIP-code missing")
+			throw EntrantError.AddressZipMissing(message: "*********ERROR*********\rZIP-code missing\r*********ERROR*********\n")
 		}
 		
 		self.city = city
@@ -332,12 +332,12 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 		
 		guard fullName.firstName != nil else {
 			
-			throw EntrantError.FirstNameMissing(message: "First Name Missing")
+			throw EntrantError.FirstNameMissing(message: "*********ERROR*********\rFirst Name Missing\r*********ERROR*********\n")
 		}
 		
 		guard fullName.lastName != nil else {
 			
-			throw EntrantError.LastNameMissing(message: "Last Name Missing")
+			throw EntrantError.LastNameMissing(message: "*********ERROR*********\rLast Name Missing\r*********ERROR*********\n")
 		}
 		
 		self.ssn = ssn

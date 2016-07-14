@@ -14,13 +14,13 @@ class ViewController: UIViewController {
 		super.viewDidLoad()
 		// Do any additional setup after loading the view, typically from a nib.
 		
-		//let areas: [Area] = [.amusement]
 		
-		//UI Logic will definitely avoid force-unwrapping
+		
+		//TODO: deal with force-unwrapping
 		let classicGuestDOB = dateFromComponents(day: 1, month: 10, year: 1978)!
 		
-		//let childGuestDOB = dateFromComponents(day: 14, month: 7, year: 2010)! //throws an error
 		let childGuestDOB = dateFromComponents(day: 14, month: 7, year: 2012)! //passes age threshold for Free Kid
+		//let childGuestDOB = dateFromComponents(day: 14, month: 7, year: 2010)! //throws 'Not a kid anymore'
 		
 		let hefsDOB = dateFromComponents(day: 12, month: 12, year: 1985)!
 		let hersDOB = dateFromComponents(day: 2, month: 11, year: 1978)!
@@ -29,8 +29,13 @@ class ViewController: UIViewController {
 		
 		let classicName = PersonFullName(firstName: "John", lastName: "Smith")
 		let childName = PersonFullName(firstName: "Harry", lastName: nil)
-		let hefsName = PersonFullName(firstName: "Maria", lastName: "Sanders")
-		let hersName = PersonFullName(firstName: "Andrew", lastName: "Ricker")
+		
+		let hefsName = PersonFullName(firstName: "Maria", lastName: "Sanders") //passes mandatory first name
+		//let hefsName = PersonFullName(firstName: nil, lastName: "Sanders") //throws 'Missing First Name'
+		
+		let hersName = PersonFullName(firstName: "Andrew", lastName: "Ricker") //passes mandatory last name
+		//let hersName = PersonFullName(firstName: "Andrew", lastName: nil) //throws 'Missing last Name'
+		
 		let hemtName = PersonFullName(firstName: "Peter", lastName: "Jackson")
 		let managerName = PersonFullName(firstName: "Managus", lastName: "Treater")
 		
@@ -61,6 +66,8 @@ class ViewController: UIViewController {
 		
 		var entrants: [Entrant] = [classicGuest, vipGuest]
 		
+		/*Error-handling at the stage of objects initialization makes sense only when required fields are wrapped inside another object or when the successful unit depends on the value iteslf rather than on its existence or absence. This leaves us with First/Last names for employees, which are wrapped inside PersonFullName object, and value of date of birth for Free Kid.*/
+		
 		//===========Init of Free Child===================
 		do {
 			
@@ -74,12 +81,12 @@ class ViewController: UIViewController {
 		
 		} catch EntrantError.NotAKidAnymore(let yearThreshold) {
 			
-			print("Looks too grown-up for \(yearThreshold)-old:)\n")
+			print("*********ERROR*********\rLooks too grown-up for \(yearThreshold)-year old:)\r*********ERROR*********\n")
 		
 		//For the purposes of 'Exhaustiveness'
 		} catch {
 			
-			fatalError("Something real bad and unpredictabe happened")
+			fatalError("Something really bad and unpredictable happened")
 		}
 		//================================================
 		
@@ -105,7 +112,7 @@ class ViewController: UIViewController {
 		//For the purposes of 'Exhaustiveness'
 		} catch {
 			
-			fatalError("Something real bad and unpredictabe happened")
+			fatalError("Something really bad and unpredictable happened")
 		}
 		//================================================
 		
@@ -130,7 +137,7 @@ class ViewController: UIViewController {
 			//For the purposes of 'Exhaustiveness'
 		} catch {
 			
-			fatalError("Something real bad and unpredictabe happened")
+			fatalError("Something really bad and unpredictable happened")
 		}
 		//================================================
 		
@@ -155,9 +162,10 @@ class ViewController: UIViewController {
 			//For the purposes of 'Exhaustiveness'
 		} catch {
 			
-			fatalError("Something real bad and unpredictabe happened")
+			fatalError("Something really bad and unpredictable happened")
 		}
 		//================================================
+		
 		
 		//===========Init of MANAGER Services Hourly Employee
 		do {
@@ -180,7 +188,7 @@ class ViewController: UIViewController {
 			//For the purposes of 'Exhaustiveness'
 		} catch {
 			
-			fatalError("Something real bad and unpredictabe happened")
+			fatalError("Something really bad and unpredictable happened")
 		}
 		//===============================================
 		
