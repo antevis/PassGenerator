@@ -1,11 +1,11 @@
-//
+/*
 //  ViewController.swift
 //  PassGenerator
 //
 //  Created by Ivan Kazakov on 11/07/16.
 //  Copyright © 2016 Antevis. All rights reserved.
 //
-// COMMENTS FOR REVIEWER'S TESTING PURPOSES MARKED //, INFORMATION COMMENTS MARKED /**/
+// COMMENTS FOR REVIEWER'S TESTING PURPOSES MARKED //, INFORMATION COMMENTS MARKED: */
 
 import UIKit
 
