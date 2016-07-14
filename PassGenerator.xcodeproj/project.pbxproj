@@ -9,12 +9,13 @@
 /* Begin PBXBuildFile section */
 		2C6E456A1D376AC200D9A919 /* AudioServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6E45691D376AC200D9A919 /* AudioServices.swift */; };
 		2C6E456C1D3770C300D9A919 /* Auxilliary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6E456B1D3770C300D9A919 /* Auxilliary.swift */; };
+		2C6E456E1D3773A200D9A919 /* Entrants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6E456D1D3773A200D9A919 /* Entrants.swift */; };
 		2C8259B01D33829C001FA2E2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8259AF1D33829C001FA2E2 /* AppDelegate.swift */; };
 		2C8259B21D33829C001FA2E2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8259B11D33829C001FA2E2 /* ViewController.swift */; };
 		2C8259B51D33829C001FA2E2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C8259B31D33829C001FA2E2 /* Main.storyboard */; };
 		2C8259B71D33829C001FA2E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C8259B61D33829C001FA2E2 /* Assets.xcassets */; };
 		2C8259BA1D33829C001FA2E2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C8259B81D33829C001FA2E2 /* LaunchScreen.storyboard */; };
-		2C8259C21D338359001FA2E2 /* PassGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8259C11D338358001FA2E2 /* PassGenerator.swift */; };
+		2C8259C21D338359001FA2E2 /* EntrantsDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8259C11D338358001FA2E2 /* EntrantsDefinition.swift */; };
 		2C8259C51D364A41001FA2E2 /* AccessDenied.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C8259C31D364A41001FA2E2 /* AccessDenied.wav */; };
 		2C8259C61D364A41001FA2E2 /* AccessGranted.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C8259C41D364A41001FA2E2 /* AccessGranted.wav */; };
 /* End PBXBuildFile section */
@@ -22,6 +23,7 @@
 /* Begin PBXFileReference section */
 		2C6E45691D376AC200D9A919 /* AudioServices.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioServices.swift; sourceTree = "<group>"; };
 		2C6E456B1D3770C300D9A919 /* Auxilliary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auxilliary.swift; sourceTree = "<group>"; };
+		2C6E456D1D3773A200D9A919 /* Entrants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Entrants.swift; sourceTree = "<group>"; };
 		2C8259AC1D33829C001FA2E2 /* PassGenerator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PassGenerator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C8259AF1D33829C001FA2E2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2C8259B11D33829C001FA2E2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -29,7 +31,7 @@
 		2C8259B61D33829C001FA2E2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2C8259B91D33829C001FA2E2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2C8259BB1D33829C001FA2E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2C8259C11D338358001FA2E2 /* PassGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassGenerator.swift; sourceTree = "<group>"; };
+		2C8259C11D338358001FA2E2 /* EntrantsDefinition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntrantsDefinition.swift; sourceTree = "<group>"; };
 		2C8259C31D364A41001FA2E2 /* AccessDenied.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = AccessDenied.wav; sourceTree = "<group>"; };
 		2C8259C41D364A41001FA2E2 /* AccessGranted.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = AccessGranted.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -72,9 +74,10 @@
 				2C8259B61D33829C001FA2E2 /* Assets.xcassets */,
 				2C8259B81D33829C001FA2E2 /* LaunchScreen.storyboard */,
 				2C8259BB1D33829C001FA2E2 /* Info.plist */,
-				2C8259C11D338358001FA2E2 /* PassGenerator.swift */,
+				2C8259C11D338358001FA2E2 /* EntrantsDefinition.swift */,
 				2C6E45691D376AC200D9A919 /* AudioServices.swift */,
 				2C6E456B1D3770C300D9A919 /* Auxilliary.swift */,
+				2C6E456D1D3773A200D9A919 /* Entrants.swift */,
 			);
 			path = PassGenerator;
 			sourceTree = "<group>";
@@ -154,8 +157,9 @@
 			files = (
 				2C6E456A1D376AC200D9A919 /* AudioServices.swift in Sources */,
 				2C8259B21D33829C001FA2E2 /* ViewController.swift in Sources */,
-				2C8259C21D338359001FA2E2 /* PassGenerator.swift in Sources */,
+				2C8259C21D338359001FA2E2 /* EntrantsDefinition.swift in Sources */,
 				2C6E456C1D3770C300D9A919 /* Auxilliary.swift in Sources */,
+				2C6E456E1D3773A200D9A919 /* Entrants.swift in Sources */,
 				2C8259B01D33829C001FA2E2 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
