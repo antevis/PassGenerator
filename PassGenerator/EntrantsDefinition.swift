@@ -8,6 +8,26 @@
 
 import Foundation
 
+//MARK: Global Scope Dictionaries
+
+//Probably not the best approach to declare dictionaries like this
+let AreaAccessByProject: [Project: [Area]] = [
+	
+	Project.oneOne: [Area.amusement, Area.rideControl],
+	Project.oneTwo: [Area.amusement, Area.rideControl, Area.maintenance],
+	Project.oneThree: Area.fullAccess(),
+	Project.twoOne: [Area.office],
+	Project.twoTwo: [Area.kitchen, Area.maintenance]
+]
+
+let AreaAccessByVendor: [Vendor: [Area]] = [
+	
+	Vendor.acme: [Area.kitchen],
+	Vendor.fedex: [Area.maintenance, Area.office],
+	Vendor.nwElectrical: Area.fullAccess(),
+	Vendor.orkin: [Area.amusement, Area.rideControl, Area.kitchen]
+]
+
 //MARK: enums
 
 enum Area {
@@ -42,6 +62,11 @@ enum Area {
 		
 		return (accessGranted, message)
 	}
+	
+	static func fullAccess() -> [Area] {
+		
+		return [Area.amusement, Area.kitchen, Area.maintenance, Area.maintenance, Area.office, Area.rideControl]
+	}
 }
 
 enum DiscountSubject: String {
@@ -75,6 +100,24 @@ enum EntrantError: ErrorType {
 	case AddressStateMissing(message: String)
 	case AddressZipMissing(message: String)
 }
+
+enum Project: String {
+	
+	case oneOne = "1001"
+	case oneTwo = "1002"
+	case oneThree = "1003"
+	case twoOne = "2001"
+	case twoTwo = "2002"
+}
+
+enum Vendor: String {
+	
+	case acme = "Acme"
+	case orkin = "Orkin"
+	case fedex = "Fedex"
+	case nwElectrical = "NW Electrical"
+}
+
 
 //MARK: structs
 
@@ -117,6 +160,8 @@ struct RideAccess {
 		return (parameter, message)
 	}
 }
+
+
 
 struct DiscountParams {
 	
@@ -232,6 +277,7 @@ protocol Entrant: Riding, BirthdayProvider, FullNameProvider, DescriptionProvide
 	func swipe() -> EntryRules
 }
 
+
 //Vendor, For Part 2
 //protocol VisitDateDependant {
 //
@@ -299,6 +345,7 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
 	}
 }
+
 
 //To encapsulate all common guest properties.
 class Guest: Entrant {

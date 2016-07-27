@@ -160,3 +160,4 @@ class Manager: Employee, ManagementTierProvider {
 		try super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "\(tier) Manager")
 	}
 }
+

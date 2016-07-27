@@ -15,6 +15,10 @@ class ViewController: UIViewController {
 		super.viewDidLoad()
 		/* Do any additional setup after loading the view, typically from a nib.*/
 		
+//		let fPAreas = projectAccess[Project.oneThree]
+//		
+//		print(fPAreas)
+		
 		/*Sure no force-unwrapping in UI Part 2*/
 		let classicGuestDOB = Aux.dateFromDMY(day: 1, month: 10, year: 1978)!
 		let vipDOB = Aux.dateFromDMY(day: 4, month: 7, year: 1776)
