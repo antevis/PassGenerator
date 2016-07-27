@@ -64,9 +64,8 @@ enum EntrantError: ErrorType {
 	case FirstNameMissing(message: String)
 	case LastNameMissing(message: String)
 	
-	//these four represent non-optional types in all initializers, thus not handling them until part 2, when filling in the UI fields
+	//these three represent non-optional types in all initializers, thus not handling them until part 2, when filling in the UI fields
 	case SsnMissing(message: String)
-	case DobMissing(message: String)
 	case ManagerTierMissing(message: String)
 	case dateOfBirthMissing(message: String)
 	

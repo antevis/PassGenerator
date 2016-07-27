@@ -65,13 +65,15 @@ class ViewController: UIViewController {
 		let vipGuestWithName = VipGuest(fullName: vipName)
 		let vipguestWithAll = VipGuest(birthDate: vipDOB, fullName: vipName)
 		
+		let seasonPassGuest = SeasonPassGuest(birthDate: vipDOB!, fullName: vipName, address: hefsAddress)
+		
 		var freeChild: FreeChildGuest?
 		var hefs: HourlyEmployeeCatering?
 		var hers: HourlyEmployeeRideService?
 		var hemt: HourlyEmployeeMaintenance?
 		var manager: Manager?
 		
-		var entrants: [Entrant] = [classicGuestWithAll, classicGuestWithNone, classicGuestWithName, classicGuestWithDob, vipGuestWithDob, vipGuestWithNone, vipGuestWithDob, vipGuestWithName, vipguestWithAll]
+		var entrants: [Entrant] = [classicGuestWithAll, classicGuestWithNone, classicGuestWithName, classicGuestWithDob, vipGuestWithDob, vipGuestWithNone, vipGuestWithDob, vipGuestWithName, vipguestWithAll, seasonPassGuest]
 		
 		/*Error-handling at the stage of objects initialization makes sense only when required fields are wrapped inside another object or when the successful unit depends on the value iteslf rather than on its existence. This leaves us with First/Last names for employees, which are wrapped inside PersonFullName object, and value of date of birth for Free Kid.*/
 		
@@ -233,8 +235,8 @@ class ViewController: UIViewController {
 		}
 		
 		/*=========== testing for double swipes per 1 ride*/
-		let doubleSwipeTester: DoubleSwipeTester = DoubleSwipeTester(entrant: classicGuestWithAll, testDurationSeconds: 19, timeStepSeconds: 1, rideDuration: 5)
-		doubleSwipeTester.testForDoubleSwipes()
+//		let doubleSwipeTester: DoubleSwipeTester = DoubleSwipeTester(entrant: classicGuestWithAll, testDurationSeconds: 19, timeStepSeconds: 1, rideDuration: 5)
+//		doubleSwipeTester.testForDoubleSwipes()
 	}
 
 	override func didReceiveMemoryWarning() {

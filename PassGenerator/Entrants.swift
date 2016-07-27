@@ -40,6 +40,36 @@ class VipGuest: Guest, DiscountClaimant {
 	}
 }
 
+//Due to equality of discount params for VIP and seasonal, the latter could be made inheriting from VIP + conforming to AddressProvider, but the match considered as coincidencial, not intentional
+class SeasonPassGuest: Guest, DiscountClaimant, AddressProvider {
+	
+	let discounts: [DiscountParams]
+	let address: Address
+	
+	init(birthDate: NSDate, fullName: PersonFullName, address: Address) {
+		
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true)
+		
+		//declaration extracted for clarity
+		let description: String = "Season Pass Guest"
+		
+		self.discounts = [
+			
+			DiscountParams(subject: .food, discountValue: 10),
+			DiscountParams(subject: .merchandise, discountValue: 20)
+		]
+		
+		self.address = address
+		
+		super.init(birthDate: birthDate, fullName: fullName, accessRules: accessRules, description: description)
+	}
+	
+	override func swipe() -> EntryRules {
+		
+		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
+	}
+}
+
 class FreeChildGuest: ClassicGuest {
 	
 	init(birthDate: NSDate, fullName: PersonFullName? = nil, description: String = "Free Child Guest") throws {
@@ -52,6 +82,8 @@ class FreeChildGuest: ClassicGuest {
 		super.init(birthDate: birthDate, fullName: fullName, description: description)
 	}
 }
+
+
 
 class HourlyEmployeeCatering: Employee {
 	
