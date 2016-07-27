@@ -66,6 +66,7 @@ class ViewController: UIViewController {
 		let vipguestWithAll = VipGuest(birthDate: vipDOB, fullName: vipName)
 		
 		let seasonPassGuest = SeasonPassGuest(birthDate: vipDOB!, fullName: vipName, address: hefsAddress)
+		let seniorGuest = SeniorGuest(birthDate: hemtDOB, fullName: vipName)
 		
 		var freeChild: FreeChildGuest?
 		var hefs: HourlyEmployeeCatering?
@@ -73,7 +74,7 @@ class ViewController: UIViewController {
 		var hemt: HourlyEmployeeMaintenance?
 		var manager: Manager?
 		
-		var entrants: [Entrant] = [classicGuestWithAll, classicGuestWithNone, classicGuestWithName, classicGuestWithDob, vipGuestWithDob, vipGuestWithNone, vipGuestWithDob, vipGuestWithName, vipguestWithAll, seasonPassGuest]
+		var entrants: [Entrant] = [classicGuestWithAll, classicGuestWithNone, classicGuestWithName, classicGuestWithDob, vipGuestWithDob, vipGuestWithNone, vipGuestWithDob, vipGuestWithName, vipguestWithAll, seasonPassGuest, seniorGuest]
 		
 		/*Error-handling at the stage of objects initialization makes sense only when required fields are wrapped inside another object or when the successful unit depends on the value iteslf rather than on its existence. This leaves us with First/Last names for employees, which are wrapped inside PersonFullName object, and value of date of birth for Free Kid.*/
 		

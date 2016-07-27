@@ -70,6 +70,31 @@ class SeasonPassGuest: Guest, DiscountClaimant, AddressProvider {
 	}
 }
 
+class SeniorGuest: Guest, DiscountClaimant {
+	
+	let discounts: [DiscountParams]
+	
+	init(birthDate: NSDate, fullName: PersonFullName) {
+		
+		let description: String = "Senior Guest"
+		
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true)
+		
+		self.discounts = [
+			
+			DiscountParams(subject: .food, discountValue: 10),
+			DiscountParams(subject: .merchandise, discountValue: 10)
+		]
+		
+		super.init(birthDate: birthDate, fullName: fullName, accessRules: accessRules, description: description)
+	}
+	
+	override func swipe() -> EntryRules {
+		
+		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
+	}
+}
+
 class FreeChildGuest: ClassicGuest {
 	
 	init(birthDate: NSDate, fullName: PersonFullName? = nil, description: String = "Free Child Guest") throws {
