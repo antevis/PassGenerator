@@ -75,11 +75,11 @@ enum DiscountSubject: String {
 	case merchandise
 }
 
-enum ManagementTier {
+enum ManagementTier: String {
 	
-	case shift
-	case general
-	case senior
+	case shift = "Shift"
+	case general = "General"
+	case senior = "Senior"
 }
 
 enum EntrantError: ErrorType {
@@ -277,6 +277,13 @@ protocol Entrant: Riding, BirthdayProvider, FullNameProvider, DescriptionProvide
 	func swipe() -> EntryRules
 }
 
+extension Entrant {
+	
+	func swipe() -> EntryRules {
+		
+		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil, greeting: greeting)
+	}
+}
 
 //Vendor, For Part 2
 //protocol VisitDateDependant {
@@ -345,7 +352,6 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
 	}
 }
-
 
 //To encapsulate all common guest properties.
 class Guest: Entrant {

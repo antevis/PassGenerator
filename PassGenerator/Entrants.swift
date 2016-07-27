@@ -157,7 +157,7 @@ class Manager: Employee, ManagementTierProvider {
 			DiscountParams(subject: .merchandise, discountValue: 25)
 		]
 		
-		try super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "\(tier) Manager")
+		try super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: discounts, fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "\(tier.rawValue) Manager")
 	}
 }
 
