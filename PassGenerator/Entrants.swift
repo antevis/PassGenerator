@@ -12,7 +12,7 @@ class ClassicGuest: Guest {
 	
 	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil, description: String = "Classic Guest") {
 		
-		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false, seeEntrantAccessRules: false)
 		super.init(birthDate: birthDate, fullName: fullName, accessRules: accessRules, description: description)
 	}
 }
@@ -23,7 +23,7 @@ class VipGuest: Guest, DiscountClaimant {
 	
 	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil, description: String = "VIP Guest") {
 		
-		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true)
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true, seeEntrantAccessRules: false)
 		
 		discounts = [
 			
@@ -35,6 +35,8 @@ class VipGuest: Guest, DiscountClaimant {
 	}
 	
 	override func swipe() -> EntryRules {
+		
+		let greeting = Aux.composeGreetingConsidering(birthDate, forEntrant: fullName)
 		
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
 	}
@@ -48,7 +50,7 @@ class SeasonPassGuest: Guest, DiscountClaimant, AddressProvider {
 	
 	init(birthDate: NSDate, fullName: PersonFullName, address: Address) {
 		
-		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true)
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true, seeEntrantAccessRules: false)
 		
 		//declaration extracted for clarity
 		let description: String = "Season Pass Guest"
@@ -66,6 +68,8 @@ class SeasonPassGuest: Guest, DiscountClaimant, AddressProvider {
 	
 	override func swipe() -> EntryRules {
 		
+		let greeting = Aux.composeGreetingConsidering(birthDate, forEntrant: fullName)
+		
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
 	}
 }
@@ -78,7 +82,7 @@ class SeniorGuest: Guest, DiscountClaimant {
 		
 		let description: String = "Senior Guest"
 		
-		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true)
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: true, seeEntrantAccessRules: false)
 		
 		self.discounts = [
 			
@@ -90,6 +94,8 @@ class SeniorGuest: Guest, DiscountClaimant {
 	}
 	
 	override func swipe() -> EntryRules {
+		
+		let greeting = Aux.composeGreetingConsidering(birthDate, forEntrant: fullName)
 		
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
 	}
@@ -148,8 +154,8 @@ class Manager: Employee, ManagementTierProvider {
 		
 		self.tier = tier
 		
-		let accessibleAreas: [Area] = [.amusement, .kitchen, .rideControl, .maintenance, .office]
-		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
+		let accessibleAreas: [Area] = Area.fullAccess()
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false, seeEntrantAccessRules: false)
 		
 		let discounts: [DiscountParams] = [
 			
@@ -161,3 +167,70 @@ class Manager: Employee, ManagementTierProvider {
 	}
 }
 
+class ContractEmployee: Employee, ProjectDependant {
+	
+	let project: Project
+	
+	init(project: Project, fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate) throws {
+		
+		self.project = project
+		
+		let accessibleAreas: [Area] = AreaAccessByProject[project] ?? []
+		let accessRules = RideAccess(unlimitedAccess: false, skipLines: false, seeEntrantAccessRules: true)
+		
+		try super.init(accessibleAreas: accessibleAreas, accessRules: accessRules, discounts: [], fullName: fullName, address: address, ssn: ssn, birthDate: birthDate, description: "Contractor Employee, Project #\(project.rawValue)")
+	}
+}
+
+class Vendor: VendorType, EntrantType, FullNameProvider, BirthdayProvider {
+	
+	let birthDate: NSDate?
+	let vendorCompany: VendorCompany
+	let accessibleAreas: [Area]
+	let fullName: PersonFullName?
+	let accessRules: RideAccess
+	let description: String
+	var visitDate: NSDate?
+	
+	init(company: VendorCompany, fullName: PersonFullName, birthDate: NSDate) throws {
+		
+		guard fullName.firstName != nil else {
+			
+			throw EntrantError.FirstNameMissing(message: "*********ERROR*********\rFirst Name Missing\r*********ERROR*********\n")
+		}
+		
+		guard fullName.lastName != nil else {
+			
+			throw EntrantError.LastNameMissing(message: "*********ERROR*********\rLast Name Missing\r*********ERROR*********\n")
+		}
+		
+		self.birthDate = birthDate
+		self.vendorCompany = company
+		self.accessibleAreas = AreaAccessByVendor[company] ?? []
+		self.fullName = fullName
+		self.accessRules = RideAccess(unlimitedAccess: false, skipLines: false, seeEntrantAccessRules: true)
+		
+		let dateString: String// = "\(visitDate ?? "never")"
+		
+		if let visitDate = visitDate {
+			
+			dateString = "\(visitDate)"
+			
+		} else {
+			
+			dateString = "Never"
+		}
+		
+		self.description = "Vendor representative of: \(company.rawValue), Visit date: \(dateString)"
+	}
+	
+	func swipe() -> EntryRules {
+		
+		self.visitDate = NSDate()
+		
+		let greeting = Aux.composeGreetingConsidering(birthDate, forEntrant: fullName)
+		
+		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil, greeting: greeting)
+	}
+	
+}

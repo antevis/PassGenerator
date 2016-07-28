@@ -20,12 +20,12 @@ let AreaAccessByProject: [Project: [Area]] = [
 	Project.twoTwo: [Area.kitchen, Area.maintenance]
 ]
 
-let AreaAccessByVendor: [Vendor: [Area]] = [
+let AreaAccessByVendor: [VendorCompany: [Area]] = [
 	
-	Vendor.acme: [Area.kitchen],
-	Vendor.fedex: [Area.maintenance, Area.office],
-	Vendor.nwElectrical: Area.fullAccess(),
-	Vendor.orkin: [Area.amusement, Area.rideControl, Area.kitchen]
+	VendorCompany.acme: [Area.kitchen],
+	VendorCompany.fedex: [Area.maintenance, Area.office],
+	VendorCompany.nwElectrical: Area.fullAccess(),
+	VendorCompany.orkin: [Area.amusement, Area.rideControl, Area.kitchen]
 ]
 
 //MARK: enums
@@ -110,7 +110,7 @@ enum Project: String {
 	case twoTwo = "2002"
 }
 
-enum Vendor: String {
+enum VendorCompany: String {
 	
 	case acme = "Acme"
 	case orkin = "Orkin"
@@ -125,7 +125,7 @@ struct RideAccess {
 	
 	let unlimitedAccess: Bool
 	let skipLines: Bool
-	//	let seeEntrantAccessRules: Bool //Uncomment in Part 2
+	let seeEntrantAccessRules: Bool //Uncomment in Part 2
 	
 	func description() -> String {
 		
@@ -133,7 +133,9 @@ struct RideAccess {
 		
 		let canSkip = "\(testAccess(self.skipLines, trueText: "Can Skip Lines", falseText: "Cannot Skip Lines").message)\r"
 		
-		return "\(rideAccess)\(canSkip)"
+		let seeRules = "\(testAccess(self.seeEntrantAccessRules, trueText: "Can See Entrant Access Rules", falseText: "Can't See Entrant Access Rules").message)\r"
+		
+		return "\(rideAccess)\(canSkip)\(seeRules)"
 	}
 	
 	func testAccess(parameter: Bool, trueText: String = "Yes", falseText: String = "No", makeSound: Bool = true) -> (param: Bool, message: String) {
@@ -269,33 +271,39 @@ protocol DescriptionProvider {
 
 //Describes any type of entrant. Extended to BirthdayProvider for implementation of extra credit
 //FullNameProvider - for optional names for all entrants.
-protocol Entrant: Riding, BirthdayProvider, FullNameProvider, DescriptionProvider {
+protocol EntrantType: Riding, BirthdayProvider, FullNameProvider, DescriptionProvider {
 	
-	var greeting: String { get }
+	//var greeting: String { get }
 	var accessibleAreas: [Area] { get }
 	
 	func swipe() -> EntryRules
 }
 
-extension Entrant {
+//extension Entrant {
+//	
+//	func swipe() -> EntryRules {
+//		
+//		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil, greeting: greeting)
+//	}
+//}
+
+protocol ProjectDependant {
 	
-	func swipe() -> EntryRules {
-		
-		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil, greeting: greeting)
-	}
+	var project: Project { get }
 }
 
 //Vendor, For Part 2
-//protocol VisitDateDependant {
-//
-//	var visitDate: NSDate { get }
-//}
+protocol VendorType: EntrantType {
+
+	var vendorCompany: VendorCompany { get }
+	var visitDate: NSDate? { get set }
+}
 
 //MARK: Entrant classes
 
 //defines Employee properties - to be extended for each specific type of employee
 //May seem over-complicated, but allows Hourly employees to be initialized in 3 lines of code
-class Employee: Entrant, AddressProvider, DiscountClaimant {
+class Employee: EntrantType, AddressProvider, DiscountClaimant {
 	
 	//Since SSN being requested from employees only, be it here
 	let ssn: String
@@ -305,7 +313,7 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 	let address: Address
 	let birthDate: NSDate?
 	let discounts: [DiscountParams]
-	let greeting: String
+	//let greeting: String
 	let description: String
 	
 	init(accessibleAreas: [Area], accessRules: RideAccess, discounts: [DiscountParams], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate, description: String) throws {
@@ -328,14 +336,14 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 		self.birthDate = birthDate
 		self.discounts = discounts
 		
-		self.greeting = Aux.composeGreetingConsidering(birthDate, forEntrant: fullName)
+		//self.greeting = Aux.composeGreetingConsidering(birthDate, forEntrant: fullName)
 		
 		self.description = description
 	}
 	
 	convenience init(accessibleAreas: [Area], fullName: PersonFullName, address: Address, ssn: String, birthDate: NSDate, description: String) throws {
 		
-		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false)
+		let accessRules = RideAccess(unlimitedAccess: true, skipLines: false, seeEntrantAccessRules: false)
 		
 		let discounts: [DiscountParams] = [
 			
@@ -349,16 +357,18 @@ class Employee: Entrant, AddressProvider, DiscountClaimant {
 	
 	func swipe() -> EntryRules {
 		
+		let greeting = Aux.composeGreetingConsidering(self.birthDate, forEntrant: self.fullName)
+		
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: discounts, greeting: greeting)
 	}
 }
 
 //To encapsulate all common guest properties.
-class Guest: Entrant {
+class Guest: EntrantType {
 	
 	var birthDate: NSDate?
 	var fullName: PersonFullName?
-	let greeting: String
+	//let greeting: String
 	let accessRules: RideAccess
 	let accessibleAreas: [Area]
 	let description: String
@@ -366,7 +376,7 @@ class Guest: Entrant {
 	init(birthDate: NSDate? = nil, fullName: PersonFullName? = nil, accessRules: RideAccess, description: String) {
 		
 		self.accessibleAreas = [.amusement]
-		self.greeting = Aux.composeGreetingConsidering(birthDate, forEntrant: fullName)
+		
 		self.accessRules = accessRules
 		
 		if let birthday = birthDate {
@@ -375,13 +385,14 @@ class Guest: Entrant {
 		}
 		
 		self.description = description
+		
+		self.fullName = fullName
 	}
 	
 	func swipe() -> EntryRules {
 		
+		let greeting = Aux.composeGreetingConsidering(birthDate, forEntrant: fullName)
+		
 		return EntryRules(areaAccess: accessibleAreas, rideAccess: accessRules, discountAccess: nil, greeting: greeting)
 	}
 }
-
-
-

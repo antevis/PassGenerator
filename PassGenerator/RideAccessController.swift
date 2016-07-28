@@ -79,13 +79,13 @@ class RideAccessController: RideDelegate {
 	}
 	
 	
-	func validateRideAccess(entrant: Entrant, makeSound: Bool = true) {
+	func validateRideAccess(entrant: EntrantType, makeSound: Bool = true) {
 		
 		let rules: EntryRules = entrant.swipe()
 		
+		let sfx: SoundFX? = makeSound ? SoundFX() : nil
+		
 		if rules.rideAccess.unlimitedAccess {
-			
-			let sfx: SoundFX? = makeSound ? SoundFX() : nil
 			
 			if !self.rideSwiped {
 				
@@ -104,14 +104,20 @@ class RideAccessController: RideDelegate {
 				print("Your ride is currently in progress. One swipe per ride, please.\n")
 			}
 			
-			sfx?.playSound()
+		} else {
+			
+			sfx?.loadDeniedSound()
+			
+			print("You don't have access to the rides.")
 		}
+		
+		sfx?.playSound()
 	}
 }
 
 class DoubleSwipeTester {
 	
-	private let entrant: Entrant
+	private let entrant: EntrantType
 	
 	private var secondsRemaining: Double
 	private var secondsElapsed: Double = 0
@@ -123,7 +129,7 @@ class DoubleSwipeTester {
 	
 	private let rideController: RideAccessController
 	
-	init(entrant: Entrant, testDurationSeconds: Double, timeStepSeconds: Double, rideDuration: Int) {
+	init(entrant: EntrantType, testDurationSeconds: Double, timeStepSeconds: Double, rideDuration: Int) {
 		
 		self.entrant = entrant
 		

@@ -15,16 +15,13 @@ class ViewController: UIViewController {
 		super.viewDidLoad()
 		/* Do any additional setup after loading the view, typically from a nib.*/
 		
-//		let fPAreas = projectAccess[Project.oneThree]
-//		
-//		print(fPAreas)
 		
 		/*Sure no force-unwrapping in UI Part 2*/
 		let classicGuestDOB = Aux.dateFromDMY(day: 1, month: 10, year: 1978)!
 		let vipDOB = Aux.dateFromDMY(day: 4, month: 7, year: 1776)
 		
-		let childGuestDOB = Aux.dateFromDMY(day: 14, month: 7, year: Aux.year() - 4)! //passes age threshold for Free Kid
-		//let childGuestDOB = Aux.dateFromDMY(day: 14, month: 7, year: Aux.year() - 6)! //throws 'Not a kid anymore'
+		let childGuestDOB = Aux.todayBirthday(year: Aux.year() - 4)! //passes age threshold for Free Kid
+		//let childGuestDOB = Aux.todayBirthday(year: Aux.year() - 6)! //throws 'Not a kid anymore'
 		
 		let hefsDOB = Aux.dateFromDMY(day: 12, month: 12, year: 1985)!
 		let hersDOB = Aux.dateFromDMY(day: 2, month: 11, year: 1978)!
@@ -44,7 +41,7 @@ class ViewController: UIViewController {
 		//let hersName = PersonFullName(firstName: "Andrew", lastName: nil) //throws 'Missing last Name'
 		
 		let hemtName = PersonFullName(firstName: "Peter", lastName: "Jackson")
-		let managerName = PersonFullName(firstName: "Managus", lastName: "Treater")
+		let managerName = PersonFullName(firstName: "Magnus", lastName: "Treater")
 		
 		/*UI fields filling will actually imlement throwing in case of missing data*/
 		let hefsAddress: Address = try! Address(street: "Broadway 1", city: "New York", state: "NY", zip: "22222")
@@ -72,13 +69,20 @@ class ViewController: UIViewController {
 		let seasonPassGuest = SeasonPassGuest(birthDate: vipDOB!, fullName: vipName, address: hefsAddress)
 		let seniorGuest = SeniorGuest(birthDate: hemtDOB, fullName: vipName)
 		
+		
+		
+		
+		
 		var freeChild: FreeChildGuest?
 		var hefs: HourlyEmployeeCatering?
 		var hers: HourlyEmployeeRideService?
 		var hemt: HourlyEmployeeMaintenance?
 		var manager: Manager?
 		
-		var entrants: [Entrant] = [classicGuestWithAll, classicGuestWithNone, classicGuestWithName, classicGuestWithDob, vipGuestWithDob, vipGuestWithNone, vipGuestWithDob, vipGuestWithName, vipguestWithAll, seasonPassGuest, seniorGuest]
+		var contractEmployee: ContractEmployee?
+		var vendor: Vendor?
+		
+		var entrants: [EntrantType] = [classicGuestWithAll, classicGuestWithNone, classicGuestWithName, classicGuestWithDob, vipGuestWithDob, vipGuestWithNone, vipGuestWithDob, vipGuestWithName, vipguestWithAll, seasonPassGuest, seniorGuest]
 		
 		/*Error-handling at the stage of objects initialization makes sense only when required fields are wrapped inside another object or when the successful unit depends on the value iteslf rather than on its existence. This leaves us with First/Last names for employees, which are wrapped inside PersonFullName object, and value of date of birth for Free Kid.*/
 		
@@ -203,6 +207,62 @@ class ViewController: UIViewController {
 			
 			fatalError("Something really bad and unpredictable happened")
 		}
+		
+		/*===============================================*/
+		
+		/*===========Init of CONTRACTOR EMPLOYEE*/
+		
+		do {
+			
+			try contractEmployee = ContractEmployee(project: Project.oneOne, fullName: vipName, address: hefsAddress, ssn: hemtSsn, birthDate: hemtDOB)
+			
+			if let candidate = contractEmployee {
+				
+				entrants.append(candidate)
+			}
+			
+		} catch EntrantError.FirstNameMissing(let msg) {
+			
+			print(msg)
+			
+		} catch EntrantError.LastNameMissing(let msg) {
+			
+			print(msg)
+			
+		} catch {
+			
+			fatalError()
+		}
+		
+		//let contractorEmployee = ContractEmployee
+		
+		/*===============================================*/
+		
+		
+		/*===========Init of Vendor*/
+		
+		do {
+			
+			try vendor = Vendor(company: VendorCompany.nwElectrical, fullName: classicName, birthDate: childGuestDOB)
+			
+			if let candidate = vendor {
+				
+				entrants.append(candidate)
+			}
+			
+		} catch EntrantError.FirstNameMissing(let msg) {
+			
+			print(msg)
+			
+		} catch EntrantError.LastNameMissing(let msg) {
+			
+			print(msg)
+			
+		} catch {
+			
+			fatalError()
+		}
+		
 		/*===============================================*/
 		
 		let areas: [Area] = [Area.amusement, Area.kitchen, Area.maintenance, Area.office, Area.rideControl]
